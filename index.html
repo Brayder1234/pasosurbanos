@@ -492,6 +492,7 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
 .ckf .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .cksum{border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:6px;font-size:13px;color:#cfcfcc}
 .cksum div{display:flex;justify-content:space-between;gap:10px}.cksum b{font-weight:600;color:var(--ink)}
+.ckvmsg{display:block;font-size:12.5px;margin-top:6px;min-height:1em;color:var(--mute)}.ckvmsg.okv{color:#7ee2a0}.ckvmsg.nov{color:#ff8a80}
 .ckerr{display:none;color:#ff8a80;font-size:13px;line-height:1.45}.ckerr.on{display:block}
 .ckerr a{color:var(--ink);text-decoration:underline}
 .done{text-align:center;padding:34px 4px 10px;display:grid;gap:14px;justify-items:center}
@@ -1024,8 +1025,11 @@ function renderBag(){const n=BAG.reduce((a,b)=>a+b.q,0);$('#bagN').textContent=n
   $$('[data-rm]',L).forEach(b=>b.onclick=()=>{BAG.splice(+b.dataset.rm,1);saveBag()})}
 
 /* ---------- pedido: datos de envío y envío a la plataforma ---------- */
-const CKEY='pu_cliente_v1';
-function orderText(o){return `Hola Pasos Urbanos 👋 Hice el pedido #${o.numero} en la web:\n\n`+o.items.map(i=>`• ${i.q} x ${i.name}${i.label?' ('+i.label+')':''} — ${fmt(i.total)}`).join('\n')+`\n\nTotal: ${fmt(o.total)}\n\nNombre: ${o.cliente.nombre}\nCiudad: ${o.cliente.ciudad}\nDirección: ${o.cliente.direccion}`}
+const CKEY='pu_cliente_v1', VKEY='pu_vend';
+// Enlace de un vendedor: pasosurbanos.store/?v=CODIGO  → el código queda guardado y se rellena al pedir
+try{const v=new URLSearchParams(location.search).get('v');if(v){const c=String(v).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);if(c)store.set(VKEY,c)}}catch(e){}
+const normV=t=>String(t||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9]/g,'').slice(0,12);
+function orderText(o){return `Hola Pasos Urbanos 👋 Hice el pedido #${o.numero} en la web:\n\n`+o.items.map(i=>`• ${i.q} x ${i.name}${i.label?' ('+i.label+')':''} — ${fmt(i.total)}`).join('\n')+`\n\nTotal: ${fmt(o.total)}\n\nNombre: ${o.cliente.nombre}\nCiudad: ${o.cliente.ciudad}\nDirección: ${o.cliente.direccion}`+(o.vcod?`\nCódigo de vendedor: ${o.vcod}`:'')}
 function renderForm(L,Fo){const c=store.get(CKEY,{});
   L.innerHTML=`<form class="ckf" id="ckf" novalidate autocomplete="on">
     <p class="cknote">Déjanos tus datos de entrega. Te escribimos por WhatsApp para confirmar disponibilidad, envío y forma de pago.</p>
@@ -1034,20 +1038,27 @@ function renderForm(L,Fo){const c=store.get(CKEY,{});
     <div class="ckl"><label for="ckC">Ciudad</label><input id="ckC" name="city" autocomplete="address-level2" maxlength="60" value="${esc(c.ciudad||'')}" placeholder="Ej: Barranquilla"></div>
     <div class="ckl"><label for="ckD">Dirección de entrega</label><input id="ckD" name="addr" autocomplete="street-address" maxlength="160" value="${esc(c.direccion||'')}" placeholder="Calle, número, barrio"></div>
     <div class="ckl"><label for="ckX">Notas (opcional)</label><textarea id="ckX" maxlength="300" placeholder="Indicaciones de entrega, otra talla de respaldo…"></textarea></div>
+    <div class="ckl"><label for="ckV">Código de vendedor (opcional)</label><input id="ckV" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:.08em" value="${esc(store.get(VKEY,''))}" placeholder="Si alguien te atendió, escribe su código"><span class="ckvmsg" id="ckVm"></span></div>
     <input class="hp" id="ckH" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="cksum">${BAG.map(i=>{const p=byId[i.id];return `<div><span>${i.q} × ${esc(full(p))}${lineLabel(i)?' · '+esc(lineLabel(i)):''}</span><b>${fmt(linePrice(i)*i.q)}</b></div>`}).join('')}</div>
     <div class="ckerr" id="ckErr"></div></form>`;
   Fo.innerHTML=`<div class="tot"><span>Total</span><b>${fmt(bagTotal())}</b></div><button class="btn btn-w" id="ckGo">Enviar pedido ${ICON.arrow}</button><button class="btn btn-o" id="ckBack" type="button">← Volver a la bolsa</button>`;
   $('#ckBack').onclick=()=>{dView='bag';renderBag()};$('#ckGo').onclick=submitOrder;$('#ckf').onsubmit=e=>{e.preventDefault();submitOrder()};
-  $$('.ckf input').forEach(i=>i.oninput=()=>i.parentElement.classList.remove('bad'))}
+  $$('.ckf input').forEach(i=>i.oninput=()=>i.parentElement.classList.remove('bad'));
+  const cv=$('#ckV'),cm=$('#ckVm');let vt=0;
+  const chkV=async()=>{const c=normV(cv.value);cm.className='ckvmsg';cm.textContent='';if(c.length<3)return;
+    try{const r=await fetch(`${API}/vendedor?codigo=${encodeURIComponent(c)}`);const j=await r.json();if(normV(cv.value)!==c)return;
+      if(j.ok){cm.className='ckvmsg okv';cm.textContent=`✓ Te atiende ${j.nombre}`}else{cm.className='ckvmsg nov';cm.textContent='No encontramos ese código. Revísalo o déjalo vacío.'}}catch(e){}};
+  cv.addEventListener('input',()=>{clearTimeout(vt);vt=setTimeout(chkV,350)});if(cv.value)chkV()}
 async function submitOrder(){
   const v=id=>$('#'+id).value.trim();const err=$('#ckErr');err.classList.remove('on');
   const cl={nombre:v('ckN'),tel:v('ckT'),ciudad:v('ckC'),direccion:v('ckD'),notas:v('ckX')};
   const bad=[];if(cl.nombre.length<2)bad.push('ckN');if(cl.tel.replace(/\D/g,'').length<7)bad.push('ckT');if(!cl.ciudad)bad.push('ckC');if(!cl.direccion)bad.push('ckD');
   if(bad.length){bad.forEach(id=>{const el=$('#'+id).parentElement;el.classList.remove('bad');void el.offsetWidth;el.classList.add('bad')});$('#'+bad[0]).focus();return}
   const btn=$('#ckGo');btn.disabled=true;btn.style.opacity='.6';btn.firstChild.textContent='Enviando… ';
-  const body={seccion:SECCION,cliente:cl,hp:$('#ckH').value,items:BAG.map(i=>({productId:i.id,variacionId:i.vrId||'',variacionColorId:i.sizeId||i.optId||'',cantidad:i.q}))};
-  const snap={cliente:cl,total:bagTotal(),items:BAG.map(i=>({q:i.q,name:full(byId[i.id]),label:lineLabel(i),total:linePrice(i)*i.q}))};
+  const vcod=normV($('#ckV').value);
+  const body={seccion:SECCION,cliente:cl,vendedor:vcod,hp:$('#ckH').value,items:BAG.map(i=>({productId:i.id,variacionId:i.vrId||'',variacionColorId:i.sizeId||i.optId||'',cantidad:i.q}))};
+  const snap={cliente:cl,vcod,total:bagTotal(),items:BAG.map(i=>({q:i.q,name:full(byId[i.id]),label:lineLabel(i),total:linePrice(i)*i.q}))};
   try{
     const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),15000);
     const r=await fetch(`${API}/order`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl.signal});clearTimeout(t);
@@ -1055,15 +1066,15 @@ async function submitOrder(){
     if(!r.ok||!j.ok){btn.disabled=false;btn.style.opacity='';btn.firstChild.textContent='Enviar pedido ';
       err.innerHTML=esc(j.error||'No pudimos enviar tu pedido.')+` Si prefieres, <a href="${waLink(orderText({...snap,numero:'—'}).replace('Hice el pedido #— en la web','Quiero hacer este pedido'))}" target="_blank" rel="noopener">escríbenos por WhatsApp</a>.`;err.classList.add('on');
       if(r.status===409){/* producto agotado o cambió: refrescar catálogo en segundo plano */ }return}
-    store.set(CKEY,{nombre:cl.nombre,tel:cl.tel,ciudad:cl.ciudad,direccion:cl.direccion});
-    lastOrder={...snap,numero:j.numero,total:j.total||snap.total};BAG=[];store.set(BKEY,BAG);dView='done';renderBag();
+    store.set(CKEY,{nombre:cl.nombre,tel:cl.tel,ciudad:cl.ciudad,direccion:cl.direccion});if(vcod)store.set(VKEY,vcod);
+    lastOrder={...snap,numero:j.numero,total:j.total||snap.total,vendedor:j.vendedor||null};BAG=[];store.set(BKEY,BAG);dView='done';renderBag();
   }catch(e){
     btn.disabled=false;btn.style.opacity='';btn.firstChild.textContent='Enviar pedido ';
     err.innerHTML=`No pudimos conectar. Revisa tu internet o <a href="${waLink(orderText({...snap,numero:'—'}).replace('Hice el pedido #— en la web','Quiero hacer este pedido'))}" target="_blank" rel="noopener">escríbenos por WhatsApp</a> y te atendemos igual.`;err.classList.add('on')}}
 function renderDone(L,Fo){const o=lastOrder;if(!o){dView='bag';return renderBag()}
   L.innerHTML=`<div class="done"><div class="okc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
     <h4>¡Pedido recibido!</h4><span class="num">PEDIDO #${esc(o.numero)}</span>
-    <p>Gracias, ${esc(o.cliente.nombre.split(' ')[0])}. Ya lo tenemos y te escribiremos por WhatsApp para confirmar tu pedido y el envío.</p>
+    <p>Gracias, ${esc(o.cliente.nombre.split(' ')[0])}. Ya lo tenemos y te escribiremos por WhatsApp para confirmar tu pedido y el envío.</p>${o.vendedor?`<span class="num">TE ATIENDE ${esc(String(o.vendedor).toUpperCase())}</span>`:''}
     <div class="cksum" style="width:100%;text-align:left">${o.items.map(i=>`<div><span>${i.q} × ${esc(i.name)}${i.label?' · '+esc(i.label):''}</span><b>${fmt(i.total)}</b></div>`).join('')}<div><span>Total</span><b>${fmt(o.total)}</b></div></div></div>`;
   Fo.innerHTML=`<a class="btn btn-w" href="${waLink(orderText(o))}" target="_blank" rel="noopener">${waIcon} Abrir WhatsApp con mi pedido</a><button class="btn btn-o" id="dSeguir" type="button">Seguir viendo la colección</button><small>Escribirnos adelanta la confirmación, pero tu pedido ya quedó registrado.</small>`;
   $('#dSeguir').onclick=closeAll}
