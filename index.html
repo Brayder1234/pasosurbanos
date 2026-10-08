@@ -890,7 +890,7 @@ function cardHTML(p,i){const r=ratingOf(p.id);const sz=sizeLabel(p);const tg=p.a
     <div class="media" data-cursor="VER">${tg?`<span class="badge ${tg==='Más vendido'||tg==='Nuevo'||tg==='Agotado'?'w':''}">${esc(tg)}</span>`:''}<span class="gtag">${p.gender}</span>
       <img class="a" src="${p.photos[0]}" alt="${esc(p.brand+' '+p.name+' '+p.color)}" loading="lazy" decoding="async">
       <img class="b" src="${p.photos[1]||p.photos[0]}" alt="" loading="lazy" decoding="async">
-      <button class="qv" tabindex="-1">Vista rápida</button></div>
+      <button class="qv" tabindex="-1">Agregar al carrito</button></div>
     <div class="info"><span class="br">${esc(p.brand)}</span><span class="rt">${r?`★ ${r.avg.toFixed(1)} <span style="color:var(--mute)">(${r.n})</span>`:''}</span>
       <h3>${esc(p.name)}</h3><span class="cw">${esc(p.color)}</span>
       <div class="pr"><b>${fmt(p.price)}</b><span class="sz">${sz?'Tallas '+sz:''}</span></div></div></article>`}
