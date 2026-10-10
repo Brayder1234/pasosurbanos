@@ -1121,7 +1121,11 @@ function renderBag(){const n=BAG.reduce((a,b)=>a+b.q,0);$('#bagN').textContent=n
 /* ---------- pedido: datos de envío y envío a la plataforma ---------- */
 const CKEY='pu_cliente_v1', VKEY='pu_vend';
 // Enlace de un vendedor: <dominio>/?v=CODIGO  → el código queda guardado y se rellena al pedir
-try{const v=new URLSearchParams(location.search).get('v');if(v){const c=String(v).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);if(c)store.set(VKEY,c)}}catch(e){}
+// El código SOLO cuenta si el cliente entró por el enlace del vendedor (?v=CODIGO en esta visita).
+// Si entra de cualquier otra forma (Instagram, Google, escribiendo la dirección…) no hay código: la venta es directa.
+let VEND_LINK='';
+try{const v=new URLSearchParams(location.search).get('v');if(v)VEND_LINK=String(v).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)}catch(e){}
+try{localStorage.removeItem(VKEY)}catch(e){}   // borra el código que versiones anteriores dejaban guardado
 const normV=t=>String(t||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9]/g,'').slice(0,12);
 function orderText(o){return `Hola Korven 👋 Hice el pedido #${o.numero} en la web:\n\n`+o.items.map(i=>`• ${i.q} x ${i.name}${i.label?' ('+i.label+')':''} — ${fmt(i.total)}`).join('\n')+`\n\nTotal: ${fmt(o.total)}\n\nNombre: ${o.cliente.nombre}\nCiudad: ${o.cliente.ciudad}\nDirección: ${o.cliente.direccion}`+(o.vcod?`\nCódigo de vendedor: ${o.vcod}`:'')}
 function renderForm(L,Fo){const c=store.get(CKEY,{});
@@ -1132,7 +1136,7 @@ function renderForm(L,Fo){const c=store.get(CKEY,{});
     <div class="ckl"><label for="ckC">Ciudad</label><input id="ckC" name="city" autocomplete="address-level2" maxlength="60" value="${esc(c.ciudad||'')}" placeholder="Ej: Barranquilla"></div>
     <div class="ckl"><label for="ckD">Dirección de entrega</label><input id="ckD" name="addr" autocomplete="street-address" maxlength="160" value="${esc(c.direccion||'')}" placeholder="Calle, número, barrio"></div>
     <div class="ckl"><label for="ckX">Notas (opcional)</label><textarea id="ckX" maxlength="300" placeholder="Indicaciones de entrega, otra talla de respaldo…"></textarea></div>
-    <div class="ckl"><label for="ckV">Código de vendedor (opcional)</label><input id="ckV" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:.08em" value="${esc(store.get(VKEY,''))}" placeholder="Si alguien te atendió, escribe su código"><span class="ckvmsg" id="ckVm"></span></div>
+    <div class="ckl"><label for="ckV">Código de vendedor (opcional)</label><input id="ckV" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:.08em" value="${esc(VEND_LINK)}" placeholder="Si alguien te atendió, escribe su código"><span class="ckvmsg" id="ckVm"></span></div>
     <input class="hp" id="ckH" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="cksum">${BAG.map(i=>{const p=byId[i.id];return `<div><span>${i.q} × ${esc(full(p))}${lineLabel(i)?' · '+esc(lineLabel(i)):''}</span><b>${fmt(linePrice(i)*i.q)}</b></div>`}).join('')}</div>
     <div class="ckerr" id="ckErr"></div></form>`;
@@ -1160,7 +1164,7 @@ async function submitOrder(){
     if(!r.ok||!j.ok){btn.disabled=false;btn.style.opacity='';btn.firstChild.textContent='Enviar pedido ';
       err.innerHTML=esc(j.error||'No pudimos enviar tu pedido.')+` Si prefieres, <a href="${waLink(orderText({...snap,numero:'—'}).replace('Hice el pedido #— en la web','Quiero hacer este pedido'))}" target="_blank" rel="noopener">escríbenos por WhatsApp</a>.`;err.classList.add('on');
       if(r.status===409){/* producto agotado o cambió: refrescar catálogo en segundo plano */ }return}
-    store.set(CKEY,{nombre:cl.nombre,tel:cl.tel,ciudad:cl.ciudad,direccion:cl.direccion});if(vcod)store.set(VKEY,vcod);
+    store.set(CKEY,{nombre:cl.nombre,tel:cl.tel,ciudad:cl.ciudad,direccion:cl.direccion});VEND_LINK='';try{const u=new URL(location.href);if(u.searchParams.has('v')){u.searchParams.delete('v');history.replaceState(null,'',u.pathname+(u.search||'')+u.hash)}}catch(e){}
     lastOrder={...snap,numero:j.numero,total:j.total||snap.total,vendedor:j.vendedor||null};BAG=[];store.set(BKEY,BAG);dView='done';renderBag();
   }catch(e){
     btn.disabled=false;btn.style.opacity='';btn.firstChild.textContent='Enviar pedido ';
