@@ -1173,10 +1173,15 @@ function renderBag(){const n=BAG.reduce((a,b)=>a+b.q,0);$('#bagN').textContent=n
 
 /* ---------- calculador de envíos ---------- */
 // Despachamos desde Soledad. Domicilio: Barranquilla y Soledad. Resto del país: transportadora con tarifa por zona.
-// Las tarifas de transportadora son ESTIMADAS (caja de tenis ~2 kg); el valor final se confirma por WhatsApp.
+// Transportadora: tabla oficial publicada por Coordinadora (Mensajería, paquetes hasta 5 kg) + 1% de manejo sobre el valor declarado.
+// Fuente: coordinadora.com/envios/tarifas-e-informacion-general (consultada 2026-10-10). Cada par en su caja ≈ 1 kg.
 const ENVIO={
   domicilio:{baq:{ciudad:'Barranquilla',precio:10000},sol:{ciudad:'Soledad',precio:12000}},
-  transportadora:{regional:15000,nacional:20000,especial:38000},
+  // precio por kilos: [1k,2k,3k,4k,5k]
+  transportadora:{local:[9000,9000,12820,16230,16230],regional:[10450,10450,16070,19610,19610],nacional:[17830,17830,25420,29270,29270],especial:[42150,42150,61430,65730,65730]},
+  manejo:.01,
+  metro:['malambo','puerto colombia','galapa'],
+  capitales:['bogota','medellin','cali','bucaramanga','cucuta','pereira','manizales','armenia','ibague','neiva','villavicencio','pasto','popayan','tunja','yopal','florencia','quibdo','bello','envigado','itagui','soacha','palmira','buenaventura','barrancabermeja','floridablanca','girardot','duitama','sogamoso','rionegro','tulua','cartago','zipaquira','chia','facatativa','fusagasuga','dosquebradas','apartado','turbo','caucasia'],
   regional:['malambo','puerto colombia','galapa','baranoa','sabanalarga','santo tomas','palmar de varela','sabanagrande','ponedera','polonuevo','juan de acosta','tubara','usiacuri','luruaco','repelon','campo de la cruz','manati','candelaria','santa lucia','suan','piojo','cartagena','turbaco','arjona','magangue','el carmen de bolivar','santa marta','cienaga','fundacion','el banco','plato','zona bananera','aracataca','valledupar','aguachica','agustin codazzi','bosconia','la jagua de ibirico','monteria','cerete','lorica','sahagun','montelibano','planeta rica','sincelejo','corozal','tolu','covenas','san marcos','riohacha','maicao','uribia','fonseca','san juan del cesar','villanueva','albania'],
   especial:['san andres','providencia','leticia','puerto narino','mitu','inirida','puerto inirida','puerto carreno','san jose del guaviare','la pedrera','nuqui','bahia solano','guapi','timbiqui','lopez de micay','tumaco','mocoa','puerto asis','puerto leguizamo','la macarena','cumaribo'],
   ciudades:['Bogotá','Medellín','Cali','Cartagena','Santa Marta','Valledupar','Montería','Sincelejo','Riohacha','Maicao','Bucaramanga','Cúcuta','Pereira','Manizales','Armenia','Ibagué','Neiva','Villavicencio','Pasto','Popayán','Tunja','Yopal','Florencia','Quibdó','Bello','Envigado','Itagüí','Soacha','Palmira','Buenaventura','Barrancabermeja','Malambo','Puerto Colombia','Galapa','Sabanalarga','Baranoa','Ciénaga','Magangué','Turbaco','Aguachica','Cereté','Lorica','San Andrés','Leticia','Tumaco','Mocoa']};
@@ -1184,7 +1189,8 @@ const SKEY='pu_envio_v1';
 let SHIP=store.get(SKEY,{modo:'',ciudad:''});
 const normC=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
 function zonaDe(ciudad){const c=normC(ciudad);if(!c)return '';
-  if(/^(barranquilla|soledad)$/.test(c))return 'local';
+  if(/^(barranquilla|soledad)$/.test(c))return 'domicilio';
+  if(ENVIO.metro.some(x=>c===x||c.startsWith(x+' ')))return 'local';
   if(ENVIO.especial.some(x=>c===x||c.startsWith(x+' ')))return 'especial';
   if(ENVIO.regional.some(x=>c===x||c.startsWith(x+' ')))return 'regional';
   return 'nacional'}
@@ -1192,10 +1198,14 @@ function zonaDe(ciudad){const c=normC(ciudad);if(!c)return '';
 function envioCalc(){const d=ENVIO.domicilio[SHIP.modo];
   if(d)return {ok:true,costo:d.precio,tipo:'domicilio',ciudad:d.ciudad,etiqueta:`Domicilio ${d.ciudad}`,estimado:false};
   if(SHIP.modo==='otra'){const z=zonaDe(SHIP.ciudad);
-    if(z==='local'){const k=normC(SHIP.ciudad)==='soledad'?'sol':'baq';SHIP.modo=k;SHIP.ciudad='';store.set(SKEY,SHIP);return envioCalc()}
-    if(z&&normC(SHIP.ciudad).length>=3)return {ok:true,costo:ENVIO.transportadora[z],tipo:'transportadora',zona:z,ciudad:SHIP.ciudad.trim(),etiqueta:`Transportadora a ${SHIP.ciudad.trim()}`,estimado:true}}
+    if(z==='domicilio'){const k=normC(SHIP.ciudad)==='soledad'?'sol':'baq';SHIP.modo=k;SHIP.ciudad='';store.set(SKEY,SHIP);return envioCalc()}
+    if(z&&normC(SHIP.ciudad).length>=3){const pares=BAG.reduce((a,b)=>a+b.q,0)||1,kg=Math.min(5,Math.max(1,pares));
+      const costo=Math.round((ENVIO.transportadora[z][kg-1]+bagTotal()*ENVIO.manejo)/100)*100;
+      // municipios pequeños fuera de la lista pueden caer en zonas más caras de la transportadora → se marca como aproximado
+      const estimado=z==='nacional'&&!ENVIO.capitales.includes(normC(SHIP.ciudad));
+      return {ok:true,costo,tipo:'transportadora',zona:z,ciudad:SHIP.ciudad.trim(),etiqueta:`Transportadora a ${SHIP.ciudad.trim()}`,estimado}}}
   return {ok:false,costo:0}}
-const ZONA_TXT={regional:'Región Caribe',nacional:'Envío nacional',especial:'Destino especial'};
+const ZONA_TXT={local:'Área metropolitana',regional:'Región Caribe',nacional:'Envío nacional',especial:'Destino especial'};
 function shipHTML(){const e=envioCalc();
   const op=(k,t,sub,pr)=>`<button type="button" class="op${SHIP.modo===k?' on':''}" data-ship="${k}"><i></i><span><b>${t}</b><small>${sub}</small></span><em>${pr}</em></button>`;
   return `<div class="ship${SHIP.modo==='otra'?' otra':''}" id="ship"><h6>Calcula tu envío</h6><div class="opts">
@@ -1205,7 +1215,7 @@ function shipHTML(){const e=envioCalc();
     <div class="city"><input id="shipC" list="shipL" maxlength="60" autocomplete="address-level2" placeholder="Escribe tu ciudad o municipio" value="${esc(SHIP.ciudad||'')}"><datalist id="shipL">${ENVIO.ciudades.map(c=>`<option value="${c}">`).join('')}</datalist>
     <div class="res" id="shipR">${shipRes(e)}</div></div></div>`}
 function shipRes(e){if(SHIP.modo!=='otra')return '';if(!e.ok)return 'Escribe tu ciudad para calcular el envío.';
-  return `${ZONA_TXT[e.zona]} · <b>aprox. ${fmt(e.costo)}</b>. Te confirmamos el valor exacto por WhatsApp.`}
+  return `${ZONA_TXT[e.zona]} por Coordinadora · <b>${e.estimado?'aprox. ':''}${fmt(e.costo)}</b>${e.estimado?'. Te confirmamos el valor exacto por WhatsApp.':'. Incluye el seguro del envío.'}`}
 function totalsHTML(){const e=envioCalc(),sub=bagTotal();
   return `<div class="tot sub"><span>Subtotal</span><b>${fmt(sub)}</b></div><div class="tot sub"><span>Envío${e.estimado?' (aprox.)':''}</span><b>${e.ok?fmt(e.costo):'—'}</b></div><div class="tot"><span>Total</span><b id="totB">${fmt(sub+(e.ok?e.costo:0))}</b></div>`}
 function bindShip(root,onChange){
