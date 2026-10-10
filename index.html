@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Pasos Urbanos · Sneakers</title>
-<meta name="description" content="Pasos Urbanos — catálogo de sneakers. Nike, Jordan, Adidas, Puma, Louis Vuitton, Amiri y Asics. Tallas 36 a 44.">
+<title>Korven · Sneakers</title>
+<meta name="description" content="Korven — catálogo de sneakers. Nike, Jordan, Adidas, Puma, Louis Vuitton, Amiri y Asics. Tallas 36 a 44.">
 <meta name="theme-color" content="#0a0a0a">
-<link rel="icon" href="img/favicon-pu.png">
+<link rel="icon" href="img/favicon-korven.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%;scroll-behavior:auto}
 body{background:var(--bg);color:var(--ink);font-family:var(--fb);font-size:16px;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-body.lock{overflow:hidden}
+body.lock{position:fixed;left:0;right:0;overflow:hidden;width:100%}
 img{display:block;max-width:100%}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:0}
@@ -124,6 +124,8 @@ body.ready .fade-up{animation:fu 1s var(--ease) forwards;animation-delay:var(--d
 .shot[data-p="0"]{transform:translate3d(32%,6%,80px) rotate(2deg);z-index:3}
 .shot[data-p="1"]{transform:translate3d(2%,-2%,0) rotate(-7deg);z-index:2;filter:brightness(.55)}
 .shot[data-p="2"]{transform:translate3d(58%,-8%,-60px) rotate(9deg);z-index:1;filter:brightness(.35)}
+.shot .lbl{transition:opacity .6s}
+.shot[data-p="1"] .lbl,.shot[data-p="2"] .lbl{opacity:0}
 .shot.enter{opacity:0}
 body.ready .shot.enter{opacity:1}
 .stage .dots{position:absolute;right:0;bottom:-6px;display:flex;gap:8px}
@@ -503,6 +505,94 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
 .done h4{font:900 26px var(--fd);letter-spacing:-.02em;text-transform:uppercase}
 .done .num{font:800 12px var(--fd);letter-spacing:.22em;color:var(--mute)}
 .done p{color:#bdbdb9;font-size:14.5px;max-width:320px}
+/* ===== Celular ===== */
+@media (hover:none),(pointer:coarse){.grain{display:none}}
+@media(max-width:760px){
+  :root{--pad:16px}
+  nav.top{padding-top:env(safe-area-inset-top)}
+  nav .row{height:58px}
+  .brand img.k{height:26px}.brand .w{font-size:15px}
+  .bagbtn{height:40px;min-width:44px}
+  .toolbar{top:calc(58px + env(safe-area-inset-top))}
+  .hero{min-height:auto;padding:84px 0 46px}
+  .stage{aspect-ratio:auto;height:min(64vw,300px);max-height:none;margin-top:0}
+  .shot{width:50%}
+  .shot[data-p="0"]{transform:translate3d(44%,4%,80px) rotate(2deg)}
+  .shot[data-p="1"]{transform:translate3d(10%,0,0) rotate(-6deg)}
+  .shot[data-p="2"]{transform:translate3d(78%,-6%,-60px) rotate(7deg)}
+  .hero h1{font-size:clamp(38px,11.2vw,52px);margin:14px 0 16px}
+  .hero p.lead{font-size:15px}
+  .ctas{margin-top:22px}.ctas .btn{flex:1;height:50px;padding:0 16px}
+  .hero .meta{margin-top:24px}
+  .hero .giant{display:none}
+  .marq{padding:14px 0}.marq .it{font-size:26px;gap:26px;padding-right:26px}
+  .sec{padding:64px 0}
+  .sh{margin-bottom:24px}
+  .sh h2{font-size:clamp(34px,10vw,46px)}
+  .toolbar{margin-bottom:18px;padding:10px 0}
+  .toolbar .in{-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+  .chip{height:40px}
+  .sel{height:40px;font-size:12px}
+  .search{height:40px}
+  .search input{font-size:16px}
+  .grid-p{gap:14px 10px}
+  .pc .media{border-radius:14px}
+  .pc .info{padding:10px 2px 0}
+  .pc .rt{font-size:11px}
+  /* lookbook: carrusel con el dedo en vez de scroll fijado */
+  .look{height:auto!important}
+  .look .pin{position:static;height:auto;padding:64px 0}
+  .look .head{margin-bottom:20px}.look .head h2{font-size:clamp(34px,10vw,46px)}.look .ct{display:none}
+  .look .track{transform:none!important;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:6px}
+  .look .track::-webkit-scrollbar{display:none}
+  .look .fr{width:72vw;scroll-snap-align:center}.look .fr:nth-child(even){margin-top:0}
+  .look .fr img{width:100%;transform:none!important}
+  .szr{grid-template-columns:38px 1fr auto;gap:10px}
+  .szr span{font-size:12px}
+  /* reseñas */
+  .rsum{padding:20px;border-radius:22px}
+  .avg .num{font-size:64px}
+  .dr{padding:8px;min-height:40px}
+  .rtools .sel{margin-left:0}
+  .help{height:38px;padding:0 14px}
+  .rc{padding:18px}
+  .fl input,.fl select,.fl textarea{font-size:16px}
+  .pick{flex-wrap:wrap;gap:4px}
+  .pick button{width:44px;height:44px}.pick svg{width:28px;height:28px}
+  .pick .lab{min-width:0;margin-left:6px}
+  form.f{padding:18px;border-radius:22px}
+  form.f>*{min-width:0}
+  .ctas .btn{letter-spacing:.1em;font-size:11px}
+  .sel{font-size:16px;text-transform:none;letter-spacing:0;font-weight:600}
+  .rtools .sel{font-size:16px}
+  #ckV::placeholder{text-transform:none;letter-spacing:0}
+  /* pie */
+  .fgrid{grid-template-columns:1fr 1fr;gap:24px 16px}
+  .fgrid>div:first-child{grid-column:1/-1}
+  .fgrid a{padding:6px 0;margin:0}
+  .fbig{font-size:22vw}
+  .fbot{flex-direction:column;gap:6px;margin-top:4px}
+  /* WhatsApp flotante más discreto y respetando la barra del iPhone */
+  .wa-float{width:52px;height:52px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom))}
+  .wa-float svg{width:25px;height:25px}
+  /* ficha y bolsa */
+  .modal{max-height:calc(100svh - env(safe-area-inset-top) - 10px)}
+  .mi{padding:20px 16px calc(24px + env(safe-area-inset-bottom))}
+  .sbtn{height:48px;min-width:56px}
+  .qty{height:52px}.qty button{width:46px}
+  .drawer{width:100vw;border-left:0}
+  .dh{padding:calc(16px + env(safe-area-inset-top)) 16px 16px}
+  .dl{padding:6px 16px}
+  .df{padding:14px 16px calc(16px + env(safe-area-inset-bottom))}
+  .ckf input,.ckf textarea{font-size:16px}
+  .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
+}
+@media(max-width:380px){
+  .hero h1{font-size:36px}
+  .grid-p{grid-template-columns:repeat(2,1fr);gap:12px 8px}
+  .pc h3{font-size:12.5px}.pc .pr b{font-size:13.5px}
+  .sbtn{min-width:50px}
+}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
   .grain{display:none}
@@ -516,8 +606,8 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
 
 <div id="loader" aria-hidden="true">
   <div class="ld-in">
-    <img class="lk" src="img/logo-pu.png" alt="">
-    <div class="lw"><span style="animation-delay:0.250s">P</span><span style="animation-delay:0.295s">A</span><span style="animation-delay:0.340s">S</span><span style="animation-delay:0.385s">O</span><span style="animation-delay:0.430s">S</span><span style="animation-delay:0.475s">&nbsp;</span><span style="animation-delay:0.520s">U</span><span style="animation-delay:0.565s">R</span><span style="animation-delay:0.610s">B</span><span style="animation-delay:0.655s">A</span><span style="animation-delay:0.700s">N</span><span style="animation-delay:0.745s">O</span><span style="animation-delay:0.790s">S</span></div>
+    <img class="lk" src="img/logo-korven.png" alt="">
+    <div class="lw"><span style="animation-delay:0.250s">K</span><span style="animation-delay:0.295s">O</span><span style="animation-delay:0.340s">R</span><span style="animation-delay:0.385s">V</span><span style="animation-delay:0.430s">E</span><span style="animation-delay:0.475s">N</span></div>
   </div>
   <div class="pct" id="pct">0%</div>
   <div class="bar"><i id="lbar"></i></div>
@@ -525,7 +615,7 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
 
 <nav class="top" id="nav">
   <div class="wrap row">
-    <a href="#top" class="brand" aria-label="Pasos Urbanos inicio"><img class="k" src="img/logo-pu.png" alt=""><span class="w">PASOS URBANOS</span></a>
+    <a href="#top" class="brand" aria-label="Korven inicio"><img class="k" src="img/logo-korven.png" alt=""><span class="w">KORVEN</span></a>
     <div class="links"><a href="#catalogo">Colección</a><a href="#look">En la calle</a><a href="#tallas">Tallas</a><a href="#resenas">Reseñas</a></div>
     <button class="bagbtn" id="bagBtn" aria-label="Abrir bolsa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="t">Bolsa</span><span class="n" id="bagN">0</span></button>
   </div>
@@ -533,7 +623,7 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
 
 <header class="hero" id="top">
   <div class="spot"></div>
-  <div class="giant" id="giant">PASOS URBANOS · PASOS URBANOS</div>
+  <div class="giant" id="giant">KORVEN · KORVEN</div>
   <div class="wrap grid">
     <div>
       <span class="eyebrow fade-up" style="--d:.3s">Colección 2026 · Sneakers</span>
@@ -599,7 +689,7 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
   <div class="wrap">
     <div class="sh">
       <div><span class="eyebrow">Reseñas</span><h2 class="split">Lo que dicen <span class="o">nuestros</span> clientes</h2></div>
-      <p class="rv">Opiniones reales de quienes ya caminan en Pasos Urbanos. ¿Ya recibiste tu par? Cuéntanos al final de la página.</p>
+      <p class="rv">Opiniones reales de quienes ya caminan en Korven. ¿Ya recibiste tu par? Cuéntanos al final de la página.</p>
     </div>
     <div class="rsum rv" id="rsum"></div>
     <div class="rtools">
@@ -637,13 +727,13 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
       <a class="btn btn-w mag" id="waFoot" target="_blank" rel="noopener">Escríbenos por WhatsApp <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
     <div class="fgrid">
-      <div><a href="#top" class="brand" style="margin-bottom:18px"><img class="k" src="img/logo-pu.png" alt="" style="height:40px"><span class="w" style="font-size:18px">PASOS URBANOS</span></a><p style="max-width:300px;color:var(--mute)">Sneakers seleccionados para quienes no pasan desapercibidos.</p></div>
+      <div><a href="#top" class="brand" style="margin-bottom:18px"><img class="k" src="img/logo-korven.png" alt="" style="height:40px"><span class="w" style="font-size:18px">KORVEN</span></a><p style="max-width:300px;color:var(--mute)">Sneakers seleccionados para quienes no pasan desapercibidos.</p></div>
       <div><h5>Tienda</h5><a href="#catalogo">Colección</a><a href="#look">Lookbook</a><a href="#tallas">Guía de tallas</a></div>
       <div><h5>Ayuda</h5><a href="#resenas">Reseñas</a><a href="#escribir">Escribir reseña</a><a href="#" id="waFoot2" target="_blank" rel="noopener">WhatsApp</a></div>
       <div><h5>Síguenos</h5><a href="#" id="igLink" target="_blank" rel="noopener">Instagram</a><a href="#" id="ttLink" target="_blank" rel="noopener">TikTok</a></div>
     </div>
-    <div class="fbig">PASOS URBANOS</div>
-    <div class="fbot"><span>© <span id="yr"></span> Pasos Urbanos. Todos los derechos reservados.</span><span>Tallas 36–39 mujer · 40–44 hombre</span></div>
+    <div class="fbig">KORVEN</div>
+    <div class="fbot"><span>© <span id="yr"></span> Korven. Todos los derechos reservados.</span><span>Tallas 36–39 mujer · 40–44 hombre</span></div>
   </div>
 </footer>
 
@@ -691,7 +781,7 @@ const CONFIG = {
 };
 
 const IMG = {"adi-runner-01.webp":"img/adi-runner-01.webp","adi-runner-02.webp":"img/adi-runner-02.webp","adi-runner-03.webp":"img/adi-runner-03.webp","adi-runner-04.webp":"img/adi-runner-04.webp","adizero-01.webp":"img/adizero-01.webp","adizero-02.webp":"img/adizero-02.webp","adizero-03.webp":"img/adizero-03.webp","adizero-04.webp":"img/adizero-04.webp","adizero-05.webp":"img/adizero-05.webp","adizero-06.webp":"img/adizero-06.webp","af1-green-01.webp":"img/af1-green-01.webp","af1-green-02.webp":"img/af1-green-02.webp","af1-green-03.webp":"img/af1-green-03.webp","af1-green-04.webp":"img/af1-green-04.webp","af1-mid-01.webp":"img/af1-mid-01.webp","af1-mid-02.webp":"img/af1-mid-02.webp","af1-mid-03.webp":"img/af1-mid-03.webp","af1-mid-04.webp":"img/af1-mid-04.webp","af1-white-01.webp":"img/af1-white-01.webp","af1-white-02.webp":"img/af1-white-02.webp","af1-white-03.webp":"img/af1-white-03.webp","af1-white-04.webp":"img/af1-white-04.webp","amiri-01.webp":"img/amiri-01.webp","amiri-02.webp":"img/amiri-02.webp","amiri-03.webp":"img/amiri-03.webp","amiri-04.webp":"img/amiri-04.webp","amiri-05.webp":"img/amiri-05.webp","asics-nyc-01.webp":"img/asics-nyc-01.webp","asics-nyc-02.webp":"img/asics-nyc-02.webp","asics-nyc-03.webp":"img/asics-nyc-03.webp","asics-nyc-04.webp":"img/asics-nyc-04.webp","asics-nyc-05.webp":"img/asics-nyc-05.webp","forum-bb-01.webp":"img/forum-bb-01.webp","forum-bb-03.webp":"img/forum-bb-03.webp","forum-bb-04.webp":"img/forum-bb-04.webp","forum-bb-05.webp":"img/forum-bb-05.webp","j1-grey-01.webp":"img/j1-grey-01.webp","j1-grey-02.webp":"img/j1-grey-02.webp","j1-grey-03.webp":"img/j1-grey-03.webp","j1-grey-04.webp":"img/j1-grey-04.webp","j1-grey-05.webp":"img/j1-grey-05.webp","j1-patent-01.webp":"img/j1-patent-01.webp","j1-patent-02.webp":"img/j1-patent-02.webp","j1-patent-03.webp":"img/j1-patent-03.webp","j1-patent-04.webp":"img/j1-patent-04.webp","j3-black-01.webp":"img/j3-black-01.webp","j3-black-02.webp":"img/j3-black-02.webp","j3-black-03.webp":"img/j3-black-03.webp","j3-black-04.webp":"img/j3-black-04.webp","j3-black-05.webp":"img/j3-black-05.webp","j3-fragment-01.webp":"img/j3-fragment-01.webp","j3-fragment-02.webp":"img/j3-fragment-02.webp","j3-fragment-03.webp":"img/j3-fragment-03.webp","j3-fragment-04.webp":"img/j3-fragment-04.webp","j3-fragment-05.webp":"img/j3-fragment-05.webp","j3-fragment-06.webp":"img/j3-fragment-06.webp","lv-skate-black-01.webp":"img/lv-skate-black-01.webp","lv-skate-black-02.webp":"img/lv-skate-black-02.webp","lv-skate-black-03.webp":"img/lv-skate-black-03.webp","lv-skate-black-04.webp":"img/lv-skate-black-04.webp","lv-skate-black-05.webp":"img/lv-skate-black-05.webp","lv-skate-black-06.webp":"img/lv-skate-black-06.webp","lv-skate-white-01.webp":"img/lv-skate-white-01.webp","lv-skate-white-02.webp":"img/lv-skate-white-02.webp","lv-skate-white-03.webp":"img/lv-skate-white-03.webp","lv-skate-white-04.webp":"img/lv-skate-white-04.webp","lv-skate-white-05.webp":"img/lv-skate-white-05.webp","m2k-01.webp":"img/m2k-01.webp","m2k-02.webp":"img/m2k-02.webp","m2k-03.webp":"img/m2k-03.webp","m2k-04.webp":"img/m2k-04.webp","m2k-05.webp":"img/m2k-05.webp","palermo-01.webp":"img/palermo-01.webp","palermo-02.webp":"img/palermo-02.webp","palermo-03.webp":"img/palermo-03.webp","palermo-04.webp":"img/palermo-04.webp","palermo-05.webp":"img/palermo-05.webp","palermo-06.webp":"img/palermo-06.webp","phoenix-01.webp":"img/phoenix-01.webp","phoenix-02.webp":"img/phoenix-02.webp","phoenix-03.webp":"img/phoenix-03.webp","phoenix-04.webp":"img/phoenix-04.webp","phoenix-05.webp":"img/phoenix-05.webp","phoenix-06.webp":"img/phoenix-06.webp","phoenix-07.webp":"img/phoenix-07.webp","phoenix-08.webp":"img/phoenix-08.webp","samba-01.webp":"img/samba-01.webp","samba-02.webp":"img/samba-02.webp","samba-03.webp":"img/samba-03.webp","samba-04.webp":"img/samba-04.webp","suede-xl-01.webp":"img/suede-xl-01.webp","suede-xl-02.webp":"img/suede-xl-02.webp","suede-xl-03.webp":"img/suede-xl-03.webp","suede-xl-04.webp":"img/suede-xl-04.webp","suede-xl-05.webp":"img/suede-xl-05.webp","suede-xl-06.webp":"img/suede-xl-06.webp","tn-aqua-01.webp":"img/tn-aqua-01.webp","tn-aqua-02.webp":"img/tn-aqua-02.webp","tn-aqua-03.webp":"img/tn-aqua-03.webp","tn-aqua-04.webp":"img/tn-aqua-04.webp","tn-aqua-05.webp":"img/tn-aqua-05.webp","tn-aqua-06.webp":"img/tn-aqua-06.webp","tn-aqua-07.webp":"img/tn-aqua-07.webp","tn-white-01.webp":"img/tn-white-01.webp","tn-white-02.webp":"img/tn-white-02.webp","tn-white-03.webp":"img/tn-white-03.webp","tn-white-04.webp":"img/tn-white-04.webp","tn-white-05.webp":"img/tn-white-05.webp","tn-white-06.webp":"img/tn-white-06.webp"};
-const LOGO_K = 'img/logo-pu.png';
+const LOGO_K = 'img/logo-korven.png';
 const W = [36,37,38,39], M = [40,41,42,43,44], ALL = [...W,...M];
 
 /* ---------- productos ---------- */
@@ -757,7 +847,7 @@ const SEED = [
  {id:'s11', name:'Isabella Vargas', city:'Barranquilla', pid:'j1-grey', size:36, rating:5, date:'2026-08-24', title:'Talla 36 perfecta', text:'Siempre me cuesta encontrar mi talla y aquí estaba. La gamuza gris es suavecita y combinan con todo. Recomendadísimos.', help:6},
  {id:'s12', name:'Mateo Ríos', city:'Barranquilla', pid:'forum-bb', size:41, rating:5, date:'2026-08-18', title:'Completos con todos los accesorios', text:'Vienen con la bolsa, los cordones extra y el charm del conejo. Una joya para mi colección.', help:11},
  {id:'s13', name:'Natalia Suárez', city:'Bucaramanga', pid:'palermo', size:39, rating:4, date:'2026-08-11', title:'Lindos y cómodos', text:'El verde con el marfil queda precioso. Son cómodos para caminar. Solo que el color crema es un poquito más claro que en la foto.', help:3},
- {id:'s14', name:'Santiago López', city:'Cartagena', pid:'tn-white', size:42, rating:5, date:'2026-08-05', title:'TN blancos, impecables', text:'Ya es mi segundo par en Pasos Urbanos. Buena calidad, buen precio y cumplen con lo que prometen. Los TN blancos se ven limpios.', help:8},
+ {id:'s14', name:'Santiago López', city:'Cartagena', pid:'tn-white', size:42, rating:5, date:'2026-08-05', title:'TN blancos, impecables', text:'Ya es mi segundo par en Korven. Buena calidad, buen precio y cumplen con lo que prometen. Los TN blancos se ven limpios.', help:8},
  {id:'s15', name:'Paula Jiménez', city:'Montería', pid:'af1-green', size:38, rating:5, date:'2026-07-30', title:'El verde está hermoso', text:'Tenía miedo de comprar por internet pero todo salió perfecto. El tono verde con la suela miel es mi favorito.', help:5},
  {id:'s16', name:'Kevin Barrios', city:'Soledad', pid:'m2k', size:40, rating:4, date:'2026-07-22', title:'Buen par para el diario', text:'Cómodos y se ven bien. Son algo grandes de volumen, que es justo lo que buscaba. Buena atención.', help:2},
  {id:'s17', name:'Alejandra Peña', city:'Barranquilla', pid:'samba', size:37, rating:5, date:'2026-10-06', title:'Los Samba más lindos', text:'Pedí por WhatsApp en la mañana y en la tarde ya los tenía. La gamuza gris y la suela miel se ven tal cual. Súper cómodos.', help:6},
@@ -827,7 +917,7 @@ function normalize(p,i){
   if(sizeItems.length&&sizeItems.every(z=>isNum(z.nombre)))sizeItems.sort((x,y)=>x.nombre-y.nombre);
   const names=sizeItems.map(z=>z.nombre), nums=names.filter(isNum).map(Number);
   const gender=nums.length&&nums.length===names.length?(Math.max(...nums)<=39?'Mujer':Math.min(...nums)>=40?'Hombre':'Unisex'):'Unisex';
-  return {id:p.id,brand:titleCase(p.marca)||'Pasos Urbanos',name:p.nombre,color:p.color||'',price:p.precio,tag:p.etiqueta||null,desc:p.desc||'',
+  return {id:p.id,brand:titleCase(p.marca)||'Korven',name:p.nombre,color:p.color||'',price:p.precio,tag:p.etiqueta||null,desc:p.desc||'',
     photos:photos.length?photos:[LOGO_K],rank:i,agotado:!!p.agotado,a:p.a||null,opt,sizeItems,sizes:names,gender};
 }
 const catRes=await fetchCatalog();
@@ -867,7 +957,7 @@ if(HERO.length)(function(){const c=$('#card3d'),dots=$('#hdots');let order=HERO.
 $('.hero').addEventListener('mousemove',e=>{const r=e.currentTarget.getBoundingClientRect();e.currentTarget.style.setProperty('--mx',(e.clientX-r.left)+'px');e.currentTarget.style.setProperty('--my',(e.clientY-r.top)+'px')});
 
 /* ---------- marquee ---------- */
-(function(){let brands=[...new Set(PRODUCTS.map(p=>p.brand))];if(!brands.length)brands=['Pasos Urbanos'];while(brands.length<6)brands=brands.concat(brands);
+(function(){let brands=[...new Set(PRODUCTS.map(p=>p.brand))];if(!brands.length)brands=['Korven'];while(brands.length<6)brands=brands.concat(brands);
   const one=brands.map((b,i)=>`<span class="${i%2?'o':''}">${b}</span><img src="${LOGO_K}" alt="">`).join('');
   $('#marq').innerHTML=`<div class="it">${one}</div><div class="it">${one}</div>`})();
 
@@ -990,8 +1080,11 @@ function openProduct(id){const p=byId[id];if(!p)return;curP=p;slide=0;qty=1;sel=
   if(FINE)bindCursor($('#modal'));
   $('#modal').scrollTop=0;
   openLayer('modal')}
-function openLayer(which){document.body.classList.add('lock');$('#ov').classList.add('on');$('#'+which).classList.add('on');$('#waFloat').classList.remove('on')}
-function closeAll(){document.body.classList.remove('lock');['ov','modal','drawer'].forEach(i=>$('#'+i).classList.remove('on'));if(dView==='done'){dView='bag';renderBag()}onScroll()}
+let lockY=0;
+function lockBody(){if(document.body.classList.contains('lock'))return;lockY=scrollY;document.body.style.top=-lockY+'px';document.body.classList.add('lock')}
+function unlockBody(){if(!document.body.classList.contains('lock'))return;document.body.classList.remove('lock');document.body.style.top='';scrollTo(0,lockY)}
+function openLayer(which){lockBody();$('#ov').classList.add('on');$('#'+which).classList.add('on');$('#waFloat').classList.remove('on')}
+function closeAll(){unlockBody();['ov','modal','drawer'].forEach(i=>$('#'+i).classList.remove('on'));if(dView==='done'){dView='bag';renderBag()}onScroll()}
 $('#ov').onclick=closeAll;addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();$('#lb').classList.remove('on')}
   if($('#modal').classList.contains('on')&&(e.key==='ArrowRight'||e.key==='ArrowLeft'))$(e.key==='ArrowRight'?'.next':'.prev',$('#modal'))?.click()});
 
@@ -1027,10 +1120,10 @@ function renderBag(){const n=BAG.reduce((a,b)=>a+b.q,0);$('#bagN').textContent=n
 
 /* ---------- pedido: datos de envío y envío a la plataforma ---------- */
 const CKEY='pu_cliente_v1', VKEY='pu_vend';
-// Enlace de un vendedor: pasosurbanos.store/?v=CODIGO  → el código queda guardado y se rellena al pedir
+// Enlace de un vendedor: <dominio>/?v=CODIGO  → el código queda guardado y se rellena al pedir
 try{const v=new URLSearchParams(location.search).get('v');if(v){const c=String(v).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);if(c)store.set(VKEY,c)}}catch(e){}
 const normV=t=>String(t||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9]/g,'').slice(0,12);
-function orderText(o){return `Hola Pasos Urbanos 👋 Hice el pedido #${o.numero} en la web:\n\n`+o.items.map(i=>`• ${i.q} x ${i.name}${i.label?' ('+i.label+')':''} — ${fmt(i.total)}`).join('\n')+`\n\nTotal: ${fmt(o.total)}\n\nNombre: ${o.cliente.nombre}\nCiudad: ${o.cliente.ciudad}\nDirección: ${o.cliente.direccion}`+(o.vcod?`\nCódigo de vendedor: ${o.vcod}`:'')}
+function orderText(o){return `Hola Korven 👋 Hice el pedido #${o.numero} en la web:\n\n`+o.items.map(i=>`• ${i.q} x ${i.name}${i.label?' ('+i.label+')':''} — ${fmt(i.total)}`).join('\n')+`\n\nTotal: ${fmt(o.total)}\n\nNombre: ${o.cliente.nombre}\nCiudad: ${o.cliente.ciudad}\nDirección: ${o.cliente.direccion}`+(o.vcod?`\nCódigo de vendedor: ${o.vcod}`:'')}
 function renderForm(L,Fo){const c=store.get(CKEY,{});
   L.innerHTML=`<form class="ckf" id="ckf" novalidate autocomplete="on">
     <p class="cknote">Déjanos tus datos de entrega. Te escribimos por WhatsApp para confirmar disponibilidad, envío y forma de pago.</p>
@@ -1089,7 +1182,7 @@ function renderSummary(){const n=REVIEWS.length;const avg=REVIEWS.reduce((a,b)=>
   const rec=Math.round(REVIEWS.filter(r=>r.rating>=4).length/n*100);
   $('#rsum').innerHTML=`<div class="avg"><div class="num">${avg.toFixed(1)}</div><div>${stars(avg,'#0d0d0d','#d9d7d0').replace('class="stars"','class="stars" style="--sz:22px"')}<small>Basado en ${n} reseñas</small></div></div>
     <div class="dist">${[5,4,3,2,1].map((s,i)=>`<button class="dr ${rFilter==String(s)?'on':''}" data-s="${s}"><span>${s} ★</span><span class="bar"><i style="--i:${i};--s:${mx?c[i]/mx:0}"></i></span><span>${c[i]}</span></button>`).join('')}</div>
-    <div style="text-align:center"><div style="font:900 44px var(--fd);letter-spacing:-.03em">${rec}%</div><small style="color:var(--mute-d);display:block;max-width:150px;margin:4px auto 16px">recomienda Pasos Urbanos a un amigo</small><a href="#escribir" class="btn btn-d" style="height:46px;padding:0 20px">Escribir reseña</a></div>`;
+    <div style="text-align:center"><div style="font:900 44px var(--fd);letter-spacing:-.03em">${rec}%</div><small style="color:var(--mute-d);display:block;max-width:150px;margin:4px auto 16px">recomienda Korven a un amigo</small><a href="#escribir" class="btn btn-d" style="height:46px;padding:0 20px">Escribir reseña</a></div>`;
   $$('.dr').forEach(b=>b.onclick=()=>{rFilter=rFilter===b.dataset.s?'all':b.dataset.s;rShown=6;renderReviewsAll()})}
 function renderStarChips(){const el=$('#rStars');const pics=REVIEWS.filter(r=>r.pic||r.photo).length;
   el.innerHTML=[['all','Todas'],['5','5 ★'],['4','4 ★'],['3','3 ★ o menos'],['pic',`Con fotos`]].map(([v,l])=>`<button class="chip ${rFilter===v?'on':''}" data-v="${v}">${l}${v==='pic'?`<sup>${pics}</sup>`:''}</button>`).join('');
@@ -1105,7 +1198,7 @@ function reviewHTML(r,i,isNew){const p=byId[r.pid];const pic=r.photo||(r.pic&&IM
    ${r.title?`<h4>${esc(r.title)}</h4>`:''}<p>${esc(r.text)}</p>
    ${pic?`<div class="ph"><img src="${pic}" alt="Foto de ${esc(r.name)}" loading="lazy"></div>`:''}
    ${p?`<div class="prod" data-id="${p.id}"><img src="${p.photos[0]}" alt=""><span>${esc(full(p))}<small>${esc(p.color)}${r.size?` · Talla ${r.size}`:''}</small></span></div>`:''}
-   ${r.reply?`<div class="reply"><b><img src="${LOGO_K}" alt="">Respuesta de Pasos Urbanos</b>${esc(r.reply)}</div>`:''}
+   ${r.reply?`<div class="reply"><b><img src="${LOGO_K}" alt="">Respuesta de Korven</b>${esc(r.reply)}</div>`:''}
    <div class="ft"><span>¿Te fue útil?</span><button class="help ${HELPED[r.id]?'on':''}" data-h="${esc(r.id)}">${ICON.thumb}<span>${h}</span></button></div></article>`}
 let revCardIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');revCardIO.unobserve(e.target)}}),{rootMargin:'0px 0px -5% 0px'});
 function renderReviews(newId){const l=reviewList();const g=$('#rgrid');
@@ -1167,7 +1260,7 @@ if(FINE&&!RM){addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;curd.st
 function bindCursor(){}
 
 /* ---------- enlaces ---------- */
-const hi='Hola Pasos Urbanos 👋 Vi el catálogo y quiero más información.';
+const hi='Hola Korven 👋 Vi el catálogo y quiero más información.';
 ['#waFoot','#waFoot2','#waFloat'].forEach(s=>$(s).href=waLink(hi));
 $('#igLink').href=CONFIG.instagram;$('#ttLink').href=CONFIG.tiktok;$('#yr').textContent=new Date().getFullYear();
 
