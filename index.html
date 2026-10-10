@@ -490,11 +490,11 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
 .lb.on{opacity:1;pointer-events:auto}
 .lb img{max-width:100%;max-height:100%;border-radius:16px;transform:scale(.94);transition:transform .5s var(--ease)}
 .lb.on img{transform:none}
-.wa-float{position:fixed;right:20px;bottom:20px;z-index:95;width:58px;height:58px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;box-shadow:0 14px 30px rgba(0,0,0,.45);transform:scale(0);transition:transform .6s var(--ease)}
+.wa-float{position:fixed;right:20px;bottom:20px;z-index:95;width:58px;height:58px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 14px 30px rgba(37,211,102,.35);transform:scale(0);transition:transform .6s var(--ease)}
 .wa-float.on{transform:scale(1)}
 .wa-float:hover{transform:scale(1.08)}
 .wa-float svg{width:28px;height:28px}
-.wa-float::before{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid var(--ink);animation:ring 2.4s var(--ease) infinite}
+.wa-float::before{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid #25D366;animation:ring 2.4s var(--ease) infinite}
 @keyframes ring{from{transform:scale(1);opacity:.8}to{transform:scale(1.6);opacity:0}}
 
 /* checkout */
@@ -1163,7 +1163,7 @@ let VEND_LINK='';
 try{const v=new URLSearchParams(location.search).get('v');if(v)VEND_LINK=String(v).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)}catch(e){}
 try{localStorage.removeItem(VKEY)}catch(e){}   // borra el código que versiones anteriores dejaban guardado
 const normV=t=>String(t||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9]/g,'').slice(0,12);
-function orderText(o){return `Hola Korven 👋 Hice el pedido #${o.numero} en la web:\n\n`+o.items.map(i=>`• ${i.q} x ${i.name}${i.label?' ('+i.label+')':''} — ${fmt(i.total)}`).join('\n')+`\n\nTotal: ${fmt(o.total)}\n\nNombre: ${o.cliente.nombre}\nCiudad: ${o.cliente.ciudad}\nDirección: ${o.cliente.direccion}`+(o.vcod?`\nCódigo de vendedor: ${o.vcod}`:'')}
+function orderText(o){return `Hola Korven \u{1F44B} Hice el pedido #${o.numero} en la web:\n\n`+o.items.map(i=>`• ${i.q} x ${i.name}${i.label?' ('+i.label+')':''} — ${fmt(i.total)}`).join('\n')+`\n\nTotal: ${fmt(o.total)}\n\nNombre: ${o.cliente.nombre}\nCiudad: ${o.cliente.ciudad}\nDirección: ${o.cliente.direccion}`+(o.vcod?`\nCódigo de vendedor: ${o.vcod}`:'')}
 function renderForm(L,Fo){const c=store.get(CKEY,{});
   L.innerHTML=`<form class="ckf" id="ckf" novalidate autocomplete="on">
     <p class="cknote">Déjanos tus datos de entrega. Te escribimos por WhatsApp para confirmar disponibilidad, envío y forma de pago.</p>
@@ -1300,7 +1300,7 @@ if(FINE&&!RM){addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;curd.st
 function bindCursor(){}
 
 /* ---------- enlaces ---------- */
-const hi='Hola Korven 👋 Vi el catálogo y quiero más información.';
+const hi='Hola Korven \u{1F44B} Vi el catálogo y quiero más información.';
 ['#waFoot','#waFoot2','#waFloat'].forEach(s=>$(s).href=waLink(hi));
 $('#igLink').href=CONFIG.instagram;if(CONFIG.tiktok)$('#ttLink').href=CONFIG.tiktok;else $('#ttLink').remove();
 $$('.ig-url').forEach(a=>a.href=CONFIG.instagram);$$('.ig-user').forEach(e=>e.textContent=CONFIG.instagramUser);
