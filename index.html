@@ -508,6 +508,22 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
 .ckf .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .cksum{border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:6px;font-size:13px;color:#cfcfcc}
 .cksum div{display:flex;justify-content:space-between;gap:10px}.cksum b{font-weight:600;color:var(--ink)}
+.ship{display:grid;gap:10px;margin:6px 0 4px}
+.ship h6{font:800 10.5px var(--fd);letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.ship .opts{display:grid;gap:8px}
+.ship .op{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--line2);border-radius:14px;background:var(--card);transition:border-color .3s,background .3s}
+.ship .op i{flex:none;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line2);position:relative;transition:border-color .3s}
+.ship .op.on{border-color:var(--ink);background:#1b1b1b}
+.ship .op.on i{border-color:var(--ink)}.ship .op.on i::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--ink)}
+.ship .op span{flex:1;display:grid;gap:1px;min-width:0}
+.ship .op b{font:700 14px var(--fd)}.ship .op small{color:var(--mute);font-size:12px}
+.ship .op em{font:800 14px var(--fd);font-style:normal;white-space:nowrap}
+.ship .city{display:none;gap:6px}.ship.otra .city{display:grid}
+.ship .city input{width:100%;height:48px;padding:0 14px;border-radius:12px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font-size:15px;outline:0}
+.ship .city input:focus{border-color:var(--ink)}
+.ship.bad .opts,.ship.bad .city input{animation:shake .4s}.ship.bad .op{border-color:#ff6b61}
+.ship .res{font-size:12.5px;color:var(--mute);min-height:1em}.ship .res b{color:var(--ink)}
+.df .tot.sub{margin-bottom:-6px}.df .tot.sub b{font:700 15px var(--fb);letter-spacing:0}
 .ckvmsg{display:block;font-size:12.5px;margin-top:6px;min-height:1em;color:var(--mute)}.ckvmsg.okv{color:#7ee2a0}.ckvmsg.nov{color:#ff8a80}
 .ckerr{display:none;color:#ff8a80;font-size:13px;line-height:1.45}.ckerr.on{display:block}
 .ckerr a{color:var(--ink);text-decoration:underline}
@@ -598,7 +614,7 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
   .dh{padding:calc(16px + env(safe-area-inset-top)) 16px 16px}
   .dl{padding:6px 16px}
   .df{padding:14px 16px calc(16px + env(safe-area-inset-bottom))}
-  .ckf input,.ckf textarea{font-size:16px}
+  .ckf input,.ckf textarea,.ship .city input{font-size:16px}
   .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
 }
 @media(max-width:380px){
@@ -1149,10 +1165,56 @@ function renderBag(){const n=BAG.reduce((a,b)=>a+b.q,0);$('#bagN').textContent=n
   if(!BAG.length){dView='bag';L.innerHTML=`<div class="dempty"><img src="${LOGO_K}" alt=""><b style="color:var(--ink);font:800 18px var(--fd)">Tu bolsa está vacía</b><span>Explora la colección y elige tu próximo par.</span><a href="#catalogo" class="btn btn-o" id="dGo">Ver colección</a></div>`;Fo.innerHTML='';$('#dGo').onclick=closeAll;return}
   if(dView==='form')return renderForm(L,Fo);
   L.innerHTML=BAG.map((it,k)=>{const p=byId[it.id];return `<div class="di" style="animation-delay:${k*60}ms"><img src="${p.photos[0]}" alt=""><div><b>${esc(full(p))}</b><small>${esc(p.color)}</small>${lineLabel(it)?`<small>${esc(lineLabel(it))}</small>`:''}<div class="q"><button data-k="${k}" data-d="-1">−</button><span>${it.q}</span><button data-k="${k}" data-d="1">+</button></div></div><div class="r"><b>${fmt(linePrice(it)*it.q)}</b><button class="rm" data-rm="${k}">Quitar</button></div></div>`}).join('');
-  Fo.innerHTML=`<div class="tot"><span>Total</span><b>${fmt(bagTotal())}</b></div><button class="btn btn-w" id="dNext">Continuar con mi pedido ${ICON.arrow}</button><small>Te confirmamos disponibilidad, envío y forma de pago por WhatsApp.</small>`;
-  $('#dNext').onclick=()=>{dView='form';renderBag()};
+  L.insertAdjacentHTML('beforeend',shipHTML());
+  const drawFoot=()=>{Fo.innerHTML=`${totalsHTML()}<button class="btn btn-w" id="dNext">Continuar con mi pedido ${ICON.arrow}</button><small>Te confirmamos disponibilidad, envío y forma de pago por WhatsApp.</small>`;$('#dNext').onclick=()=>{dView='form';renderBag()}};
+  drawFoot();bindShip(L,drawFoot);
   $$('[data-d]',L).forEach(b=>b.onclick=()=>{const it=BAG[+b.dataset.k];it.q=Math.max(1,Math.min(9,it.q+ +b.dataset.d));saveBag()});
   $$('[data-rm]',L).forEach(b=>b.onclick=()=>{BAG.splice(+b.dataset.rm,1);saveBag()})}
+
+/* ---------- calculador de envíos ---------- */
+// Despachamos desde Soledad. Domicilio: Barranquilla y Soledad. Resto del país: transportadora con tarifa por zona.
+// Las tarifas de transportadora son ESTIMADAS (caja de tenis ~2 kg); el valor final se confirma por WhatsApp.
+const ENVIO={
+  domicilio:{baq:{ciudad:'Barranquilla',precio:10000},sol:{ciudad:'Soledad',precio:12000}},
+  transportadora:{regional:15000,nacional:20000,especial:38000},
+  regional:['malambo','puerto colombia','galapa','baranoa','sabanalarga','santo tomas','palmar de varela','sabanagrande','ponedera','polonuevo','juan de acosta','tubara','usiacuri','luruaco','repelon','campo de la cruz','manati','candelaria','santa lucia','suan','piojo','cartagena','turbaco','arjona','magangue','el carmen de bolivar','santa marta','cienaga','fundacion','el banco','plato','zona bananera','aracataca','valledupar','aguachica','agustin codazzi','bosconia','la jagua de ibirico','monteria','cerete','lorica','sahagun','montelibano','planeta rica','sincelejo','corozal','tolu','covenas','san marcos','riohacha','maicao','uribia','fonseca','san juan del cesar','villanueva','albania'],
+  especial:['san andres','providencia','leticia','puerto narino','mitu','inirida','puerto inirida','puerto carreno','san jose del guaviare','la pedrera','nuqui','bahia solano','guapi','timbiqui','lopez de micay','tumaco','mocoa','puerto asis','puerto leguizamo','la macarena','cumaribo'],
+  ciudades:['Bogotá','Medellín','Cali','Cartagena','Santa Marta','Valledupar','Montería','Sincelejo','Riohacha','Maicao','Bucaramanga','Cúcuta','Pereira','Manizales','Armenia','Ibagué','Neiva','Villavicencio','Pasto','Popayán','Tunja','Yopal','Florencia','Quibdó','Bello','Envigado','Itagüí','Soacha','Palmira','Buenaventura','Barrancabermeja','Malambo','Puerto Colombia','Galapa','Sabanalarga','Baranoa','Ciénaga','Magangué','Turbaco','Aguachica','Cereté','Lorica','San Andrés','Leticia','Tumaco','Mocoa']};
+const SKEY='pu_envio_v1';
+let SHIP=store.get(SKEY,{modo:'',ciudad:''});
+const normC=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
+function zonaDe(ciudad){const c=normC(ciudad);if(!c)return '';
+  if(/^(barranquilla|soledad)$/.test(c))return 'local';
+  if(ENVIO.especial.some(x=>c===x||c.startsWith(x+' ')))return 'especial';
+  if(ENVIO.regional.some(x=>c===x||c.startsWith(x+' ')))return 'regional';
+  return 'nacional'}
+// Devuelve {ok, costo, tipo, ciudad, etiqueta, estimado}
+function envioCalc(){const d=ENVIO.domicilio[SHIP.modo];
+  if(d)return {ok:true,costo:d.precio,tipo:'domicilio',ciudad:d.ciudad,etiqueta:`Domicilio ${d.ciudad}`,estimado:false};
+  if(SHIP.modo==='otra'){const z=zonaDe(SHIP.ciudad);
+    if(z==='local'){const k=normC(SHIP.ciudad)==='soledad'?'sol':'baq';SHIP.modo=k;SHIP.ciudad='';store.set(SKEY,SHIP);return envioCalc()}
+    if(z&&normC(SHIP.ciudad).length>=3)return {ok:true,costo:ENVIO.transportadora[z],tipo:'transportadora',zona:z,ciudad:SHIP.ciudad.trim(),etiqueta:`Transportadora a ${SHIP.ciudad.trim()}`,estimado:true}}
+  return {ok:false,costo:0}}
+const ZONA_TXT={regional:'Región Caribe',nacional:'Envío nacional',especial:'Destino especial'};
+function shipHTML(){const e=envioCalc();
+  const op=(k,t,sub,pr)=>`<button type="button" class="op${SHIP.modo===k?' on':''}" data-ship="${k}"><i></i><span><b>${t}</b><small>${sub}</small></span><em>${pr}</em></button>`;
+  return `<div class="ship${SHIP.modo==='otra'?' otra':''}" id="ship"><h6>Calcula tu envío</h6><div class="opts">
+    ${op('baq','Barranquilla','Domicilio',fmt(ENVIO.domicilio.baq.precio))}
+    ${op('sol','Soledad','Domicilio',fmt(ENVIO.domicilio.sol.precio))}
+    ${op('otra','Otra ciudad','Por transportadora','Según destino')}</div>
+    <div class="city"><input id="shipC" list="shipL" maxlength="60" autocomplete="address-level2" placeholder="Escribe tu ciudad o municipio" value="${esc(SHIP.ciudad||'')}"><datalist id="shipL">${ENVIO.ciudades.map(c=>`<option value="${c}">`).join('')}</datalist>
+    <div class="res" id="shipR">${shipRes(e)}</div></div></div>`}
+function shipRes(e){if(SHIP.modo!=='otra')return '';if(!e.ok)return 'Escribe tu ciudad para calcular el envío.';
+  return `${ZONA_TXT[e.zona]} · <b>aprox. ${fmt(e.costo)}</b>. Te confirmamos el valor exacto por WhatsApp.`}
+function totalsHTML(){const e=envioCalc(),sub=bagTotal();
+  return `<div class="tot sub"><span>Subtotal</span><b>${fmt(sub)}</b></div><div class="tot sub"><span>Envío${e.estimado?' (aprox.)':''}</span><b>${e.ok?fmt(e.costo):'—'}</b></div><div class="tot"><span>Total</span><b id="totB">${fmt(sub+(e.ok?e.costo:0))}</b></div>`}
+function bindShip(root,onChange){
+  $$('[data-ship]',root).forEach(b=>b.onclick=()=>{SHIP.modo=b.dataset.ship;store.set(SKEY,SHIP);const sh=$('#ship');sh.classList.remove('bad');
+    $$('[data-ship]',root).forEach(x=>x.classList.toggle('on',x===b));sh.classList.toggle('otra',SHIP.modo==='otra');
+    if(SHIP.modo==='otra'){$('#shipC').value=SHIP.ciudad||'';setTimeout(()=>$('#shipC').focus(),50)}$('#shipR').innerHTML=shipRes(envioCalc());onChange()});
+  const ci=$('#shipC',root);if(ci)ci.addEventListener('input',()=>{SHIP.ciudad=ci.value;store.set(SKEY,SHIP);$('#ship').classList.remove('bad');const e=envioCalc();
+    if(SHIP.modo!=='otra'){$$('[data-ship]',root).forEach(x=>x.classList.toggle('on',x.dataset.ship===SHIP.modo));$('#ship').classList.remove('otra')}
+    $('#shipR').innerHTML=shipRes(e);onChange()})}
 
 /* ---------- pedido: datos de envío y envío a la plataforma ---------- */
 const CKEY='pu_cliente_v1', VKEY='pu_vend';
@@ -1163,21 +1225,22 @@ let VEND_LINK='';
 try{const v=new URLSearchParams(location.search).get('v');if(v)VEND_LINK=String(v).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)}catch(e){}
 try{localStorage.removeItem(VKEY)}catch(e){}   // borra el código que versiones anteriores dejaban guardado
 const normV=t=>String(t||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9]/g,'').slice(0,12);
-function orderText(o){return `Hola Korven \u{1F44B} Hice el pedido #${o.numero} en la web:\n\n`+o.items.map(i=>`• ${i.q} x ${i.name}${i.label?' ('+i.label+')':''} — ${fmt(i.total)}`).join('\n')+`\n\nTotal: ${fmt(o.total)}\n\nNombre: ${o.cliente.nombre}\nCiudad: ${o.cliente.ciudad}\nDirección: ${o.cliente.direccion}`+(o.vcod?`\nCódigo de vendedor: ${o.vcod}`:'')}
+function orderText(o){return `Hola Korven \u{1F44B} Hice el pedido #${o.numero} en la web:\n\n`+o.items.map(i=>`• ${i.q} x ${i.name}${i.label?' ('+i.label+')':''} — ${fmt(i.total)}`).join('\n')+(o.envio&&o.envio.ok?`\n\nSubtotal: ${fmt(o.subtotal)}\nEnvío (${o.envio.etiqueta}): ${o.envio.estimado?'aprox. ':''}${fmt(o.envio.costo)}`:'')+`\n\nTotal: ${fmt(o.total)}\n\nNombre: ${o.cliente.nombre}\nCiudad: ${o.cliente.ciudad}\nDirección: ${o.cliente.direccion}`+(o.vcod?`\nCódigo de vendedor: ${o.vcod}`:'')}
 function renderForm(L,Fo){const c=store.get(CKEY,{});
   L.innerHTML=`<form class="ckf" id="ckf" novalidate autocomplete="on">
     <p class="cknote">Déjanos tus datos de entrega. Te escribimos por WhatsApp para confirmar disponibilidad, envío y forma de pago.</p>
     <div class="ckl"><label for="ckN">Nombre completo</label><input id="ckN" name="name" autocomplete="name" maxlength="60" value="${esc(c.nombre||'')}" placeholder="Tu nombre"></div>
     <div class="ckl"><label for="ckT">WhatsApp / teléfono</label><input id="ckT" name="tel" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" value="${esc(c.tel||'')}" placeholder="300 000 0000"></div>
-    <div class="ckl"><label for="ckC">Ciudad</label><input id="ckC" name="city" autocomplete="address-level2" maxlength="60" value="${esc(c.ciudad||'')}" placeholder="Ej: Barranquilla"></div>
+    ${shipHTML()}
     <div class="ckl"><label for="ckD">Dirección de entrega</label><input id="ckD" name="addr" autocomplete="street-address" maxlength="160" value="${esc(c.direccion||'')}" placeholder="Calle, número, barrio"></div>
     <div class="ckl"><label for="ckX">Notas (opcional)</label><textarea id="ckX" maxlength="300" placeholder="Indicaciones de entrega, otra talla de respaldo…"></textarea></div>
     <div class="ckl"><label for="ckV">Código de vendedor (opcional)</label><input id="ckV" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:.08em" value="${esc(VEND_LINK)}" placeholder="Si alguien te atendió, escribe su código"><span class="ckvmsg" id="ckVm"></span></div>
     <input class="hp" id="ckH" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="cksum">${BAG.map(i=>{const p=byId[i.id];return `<div><span>${i.q} × ${esc(full(p))}${lineLabel(i)?' · '+esc(lineLabel(i)):''}</span><b>${fmt(linePrice(i)*i.q)}</b></div>`}).join('')}</div>
     <div class="ckerr" id="ckErr"></div></form>`;
-  Fo.innerHTML=`<div class="tot"><span>Total</span><b>${fmt(bagTotal())}</b></div><button class="btn btn-w" id="ckGo">Enviar pedido ${ICON.arrow}</button><button class="btn btn-o" id="ckBack" type="button">← Volver a la bolsa</button>`;
-  $('#ckBack').onclick=()=>{dView='bag';renderBag()};$('#ckGo').onclick=submitOrder;$('#ckf').onsubmit=e=>{e.preventDefault();submitOrder()};
+  const drawFoot=()=>{Fo.innerHTML=`${totalsHTML()}<button class="btn btn-w" id="ckGo">Enviar pedido ${ICON.arrow}</button><button class="btn btn-o" id="ckBack" type="button">← Volver a la bolsa</button>`;
+    $('#ckBack').onclick=()=>{dView='bag';renderBag()};$('#ckGo').onclick=submitOrder};
+  drawFoot();bindShip(L,drawFoot);$('#ckf').onsubmit=e=>{e.preventDefault();submitOrder()};
   $$('.ckf input').forEach(i=>i.oninput=()=>i.parentElement.classList.remove('bad'));
   const cv=$('#ckV'),cm=$('#ckVm');let vt=0;
   const chkV=async()=>{const c=normV(cv.value);cm.className='ckvmsg';cm.textContent='';if(c.length<3)return;
@@ -1186,13 +1249,17 @@ function renderForm(L,Fo){const c=store.get(CKEY,{});
   cv.addEventListener('input',()=>{clearTimeout(vt);vt=setTimeout(chkV,350)});if(cv.value)chkV()}
 async function submitOrder(){
   const v=id=>$('#'+id).value.trim();const err=$('#ckErr');err.classList.remove('on');
-  const cl={nombre:v('ckN'),tel:v('ckT'),ciudad:v('ckC'),direccion:v('ckD'),notas:v('ckX')};
-  const bad=[];if(cl.nombre.length<2)bad.push('ckN');if(cl.tel.replace(/\D/g,'').length<7)bad.push('ckT');if(!cl.ciudad)bad.push('ckC');if(!cl.direccion)bad.push('ckD');
-  if(bad.length){bad.forEach(id=>{const el=$('#'+id).parentElement;el.classList.remove('bad');void el.offsetWidth;el.classList.add('bad')});$('#'+bad[0]).focus();return}
+  const env=envioCalc();
+  const cl={nombre:v('ckN'),tel:v('ckT'),ciudad:env.ok?env.ciudad:'',direccion:v('ckD'),notas:v('ckX')};
+  const bad=[];if(cl.nombre.length<2)bad.push('ckN');if(cl.tel.replace(/\D/g,'').length<7)bad.push('ckT');if(!cl.direccion)bad.push('ckD');
+  if(!env.ok){const sh=$('#ship');sh.classList.remove('bad');void sh.offsetWidth;sh.classList.add('bad');
+    if(!bad.length){sh.scrollIntoView({block:'center',behavior:RM?'auto':'smooth'});if(SHIP.modo==='otra')$('#shipC').focus()}}
+  if(bad.length||!env.ok){if(!bad.length)return;bad.forEach(id=>{const el=$('#'+id).parentElement;el.classList.remove('bad');void el.offsetWidth;el.classList.add('bad')});$('#'+bad[0]).focus();return}
   const btn=$('#ckGo');btn.disabled=true;btn.style.opacity='.6';btn.firstChild.textContent='Enviando… ';
   const vcod=normV($('#ckV').value);
-  const body={seccion:SECCION,cliente:cl,vendedor:vcod,hp:$('#ckH').value,items:BAG.map(i=>({productId:i.id,variacionId:i.vrId||'',variacionColorId:i.sizeId||i.optId||'',cantidad:i.q}))};
-  const snap={cliente:cl,vcod,total:bagTotal(),items:BAG.map(i=>({q:i.q,name:full(byId[i.id]),label:lineLabel(i),total:linePrice(i)*i.q}))};
+  const envTxt=`Envío: ${env.etiqueta} ${env.estimado?'aprox. ':''}${fmt(env.costo)}`;
+  const body={seccion:SECCION,cliente:{...cl,notas:(envTxt+(cl.notas?' | '+cl.notas:'')).slice(0,300)},vendedor:vcod,hp:$('#ckH').value,items:BAG.map(i=>({productId:i.id,variacionId:i.vrId||'',variacionColorId:i.sizeId||i.optId||'',cantidad:i.q}))};
+  const snap={cliente:cl,vcod,subtotal:bagTotal(),envio:env,total:bagTotal()+env.costo,items:BAG.map(i=>({q:i.q,name:full(byId[i.id]),label:lineLabel(i),total:linePrice(i)*i.q}))};
   try{
     const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),15000);
     const r=await fetch(`${API}/order`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl.signal});clearTimeout(t);
@@ -1201,7 +1268,7 @@ async function submitOrder(){
       err.innerHTML=esc(j.error||'No pudimos enviar tu pedido.')+` Si prefieres, <a href="${waLink(orderText({...snap,numero:'—'}).replace('Hice el pedido #— en la web','Quiero hacer este pedido'))}" target="_blank" rel="noopener">escríbenos por WhatsApp</a>.`;err.classList.add('on');
       if(r.status===409){/* producto agotado o cambió: refrescar catálogo en segundo plano */ }return}
     store.set(CKEY,{nombre:cl.nombre,tel:cl.tel,ciudad:cl.ciudad,direccion:cl.direccion});VEND_LINK='';try{const u=new URL(location.href);if(u.searchParams.has('v')){u.searchParams.delete('v');history.replaceState(null,'',u.pathname+(u.search||'')+u.hash)}}catch(e){}
-    lastOrder={...snap,numero:j.numero,total:j.total||snap.total,vendedor:j.vendedor||null};BAG=[];store.set(BKEY,BAG);dView='done';renderBag();
+    lastOrder={...snap,numero:j.numero,subtotal:j.total||snap.subtotal,total:(j.total||snap.subtotal)+env.costo,vendedor:j.vendedor||null};BAG=[];store.set(BKEY,BAG);dView='done';renderBag();
   }catch(e){
     btn.disabled=false;btn.style.opacity='';btn.firstChild.textContent='Enviar pedido ';
     err.innerHTML=`No pudimos conectar. Revisa tu internet o <a href="${waLink(orderText({...snap,numero:'—'}).replace('Hice el pedido #— en la web','Quiero hacer este pedido'))}" target="_blank" rel="noopener">escríbenos por WhatsApp</a> y te atendemos igual.`;err.classList.add('on')}}
@@ -1209,7 +1276,7 @@ function renderDone(L,Fo){const o=lastOrder;if(!o){dView='bag';return renderBag(
   L.innerHTML=`<div class="done"><div class="okc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div>
     <h4>¡Pedido recibido!</h4><span class="num">PEDIDO #${esc(o.numero)}</span>
     <p>Gracias, ${esc(o.cliente.nombre.split(' ')[0])}. Ya lo tenemos y te escribiremos por WhatsApp para confirmar tu pedido y el envío.</p>${o.vendedor?`<span class="num">TE ATIENDE ${esc(String(o.vendedor).toUpperCase())}</span>`:''}
-    <div class="cksum" style="width:100%;text-align:left">${o.items.map(i=>`<div><span>${i.q} × ${esc(i.name)}${i.label?' · '+esc(i.label):''}</span><b>${fmt(i.total)}</b></div>`).join('')}<div><span>Total</span><b>${fmt(o.total)}</b></div></div></div>`;
+    <div class="cksum" style="width:100%;text-align:left">${o.items.map(i=>`<div><span>${i.q} × ${esc(i.name)}${i.label?' · '+esc(i.label):''}</span><b>${fmt(i.total)}</b></div>`).join('')}${o.envio&&o.envio.ok?`<div><span>Envío · ${esc(o.envio.etiqueta)}${o.envio.estimado?' (aprox.)':''}</span><b>${fmt(o.envio.costo)}</b></div>`:''}<div><span>Total</span><b>${fmt(o.total)}</b></div></div></div>`;
   Fo.innerHTML=`<a class="btn btn-w" href="${waLink(orderText(o))}" target="_blank" rel="noopener">${waIcon} Abrir WhatsApp con mi pedido</a><button class="btn btn-o" id="dSeguir" type="button">Seguir viendo la colección</button><small>Escribirnos adelanta la confirmación, pero tu pedido ya quedó registrado.</small>`;
   $('#dSeguir').onclick=closeAll}
 $('#bagBtn').onclick=()=>{if(dView==='done')dView='bag';renderBag();openLayer('drawer')};$('#dX').onclick=closeAll;
