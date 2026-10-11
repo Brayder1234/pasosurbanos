@@ -363,6 +363,15 @@ form.f .full{grid-column:1/-1}
 
 /* ---------- footer ---------- */
 footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden;position:relative}
+.trab{padding:clamp(50px,8vw,100px) 0 0;background:var(--bg)}
+.tcard{display:flex;justify-content:space-between;align-items:end;gap:30px;flex-wrap:wrap;padding:clamp(28px,5vw,60px);border:1px solid var(--line);border-radius:28px;background:radial-gradient(700px circle at 85% 0%,rgba(255,255,255,.07),transparent 60%),var(--bg2);transition:border-color .4s,transform .6s var(--ease)}
+.tcard:hover{border-color:#555;transform:translateY(-4px)}
+.tcard .ttx{max-width:640px}
+.tcard h2{font:900 clamp(34px,5.4vw,80px)/.92 var(--fd);letter-spacing:-.035em;text-transform:uppercase;margin:16px 0 18px}
+.tcard h2 .o{color:#77776f}
+.tcard p{color:var(--mute);max-width:460px}
+.tcard:hover .btn::before{transform:none}
+@media(max-width:760px){.tcard .btn{width:100%;letter-spacing:.08em;font-size:11px;padding:0 16px;white-space:nowrap}}
 .redes{padding:clamp(60px,9vw,110px) 0 clamp(40px,6vw,70px);background:var(--bg)}
 .rgrid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:760px){.rgrid2{grid-template-columns:1fr}}
@@ -646,7 +655,7 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
 <nav class="top" id="nav">
   <div class="wrap row">
     <a href="#top" class="brand" aria-label="Korven inicio"><img class="k" src="img/logo-korven.png" alt=""><span class="w">KORVEN</span></a>
-    <div class="links"><a href="#catalogo">Colección</a><a href="#look">En la calle</a><a href="#tallas">Tallas</a><a href="#resenas">Reseñas</a></div>
+    <div class="links"><a href="#catalogo">Colección</a><a href="#look">En la calle</a><a href="#tallas">Tallas</a><a href="#resenas">Reseñas</a><a href="https://trabaja.korvenoficial.store" target="_blank" rel="noopener">Trabaja con nosotros</a></div>
     <button class="bagbtn" id="bagBtn" aria-label="Abrir bolsa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="t">Bolsa</span><span class="n" id="bagN">0</span></button>
   </div>
 </nav>
@@ -750,6 +759,19 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
   </div>
 </section>
 
+<section class="trab" id="trabaja">
+  <div class="wrap">
+    <a class="tcard rv" href="https://trabaja.korvenoficial.store" target="_blank" rel="noopener">
+      <div class="ttx">
+        <span class="eyebrow">Trabaja con nosotros</span>
+        <h2 class="split">¿Quieres vender <span class="o">con nosotros?</span></h2>
+        <p>Tú buscas los clientes, nosotros despachamos. Sin inversión, sin inventario y con tu propio enlace de ventas.</p>
+      </div>
+      <span class="btn btn-w">Quiero trabajar con Korven <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+  </div>
+</section>
+
 <section class="redes" id="redes">
   <div class="wrap">
     <div class="sh">
@@ -780,7 +802,7 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
     <div class="fgrid">
       <div><a href="#top" class="brand" style="margin-bottom:18px"><img class="k" src="img/logo-korven.png" alt="" style="height:40px"><span class="w" style="font-size:18px">KORVEN</span></a><p style="max-width:300px;color:var(--mute)">Sneakers seleccionados para quienes no pasan desapercibidos.</p></div>
       <div><h5>Tienda</h5><a href="#catalogo">Colección</a><a href="#look">Lookbook</a><a href="#tallas">Guía de tallas</a></div>
-      <div><h5>Ayuda</h5><a href="#resenas">Reseñas</a><a href="#escribir">Escribir reseña</a><a href="#" id="waFoot2" target="_blank" rel="noopener">WhatsApp</a></div>
+      <div><h5>Ayuda</h5><a href="#resenas">Reseñas</a><a href="#escribir">Escribir reseña</a><a href="https://trabaja.korvenoficial.store" target="_blank" rel="noopener">Trabaja con nosotros</a><a href="#" id="waFoot2" target="_blank" rel="noopener">WhatsApp</a></div>
       <div><h5>Síguenos</h5><a href="#" id="igLink" target="_blank" rel="noopener">Instagram</a><a href="#" id="ttLink" target="_blank" rel="noopener">TikTok</a></div>
     </div>
     <div class="fbig">KORVEN</div>
