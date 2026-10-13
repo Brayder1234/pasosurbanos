@@ -994,7 +994,7 @@ function normalize(p,i){
   let sizeItems=talla?talla.items.slice():[];
   if(sizeItems.length&&sizeItems.every(z=>isNum(z.nombre)))sizeItems.sort((x,y)=>x.nombre-y.nombre);
   const names=sizeItems.map(z=>z.nombre), nums=names.filter(isNum).map(Number);
-  const gender=nums.length&&nums.length===names.length?(Math.max(...nums)<=39?'Mujer':Math.min(...nums)>=40?'Hombre':'Unisex'):'Unisex';
+  const gender=['Mujer','Hombre','Unisex'].includes(p.genero)?p.genero:nums.length&&nums.length===names.length?(Math.max(...nums)<=39?'Mujer':Math.min(...nums)>=40?'Hombre':'Unisex'):'Unisex';
   return {id:p.id,brand:titleCase(p.marca)||'Korven',name:p.nombre,color:p.color||'',price:p.precio,tag:p.etiqueta||null,desc:p.desc||'',
     photos:photos.length?photos:[LOGO_K],rank:i,agotado:!!p.agotado,a:p.a||null,opt,sizeItems,sizes:names,gender};
 }
