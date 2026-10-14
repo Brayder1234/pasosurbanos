@@ -1260,6 +1260,7 @@ const CKEY='pu_cliente_v1', VKEY='pu_vend';
 // Enlace de un vendedor: <dominio>/?v=CODIGO  → el código queda guardado y se rellena al pedir
 // El código SOLO cuenta si el cliente entró por el enlace del vendedor (?v=CODIGO en esta visita).
 // Si entra de cualquier otra forma (Instagram, Google, escribiendo la dirección…) no hay código: la venta es directa.
+(function(){try{const pid=new URLSearchParams(location.search).get('p');if(!pid)return;let n=0;const iv=setInterval(()=>{if(typeof byId!=='undefined'&&byId[pid]){clearInterval(iv);setTimeout(()=>openProduct(pid),300)}else if(++n>60)clearInterval(iv)},250)}catch(e){}})();
 let VEND_LINK='';
 try{const v=new URLSearchParams(location.search).get('v');if(v)VEND_LINK=String(v).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12)}catch(e){}
 try{localStorage.removeItem(VKEY)}catch(e){}   // borra el código que versiones anteriores dejaban guardado
