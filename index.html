@@ -639,6 +639,16 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
   *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
   .grain{display:none}
 }
+
+/* ---------- extras en la bolsa ---------- */
+.exw{margin:18px 0 4px;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--bg2)}
+.exh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}.exh b{font-size:14px}.exh small{color:var(--mute);font-size:12px}
+.exi{display:grid;grid-template-columns:22px 48px 1fr auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:border-color .15s,background .15s}
+.exi+.exi{margin-top:8px}.exi.on{border-color:#25D366;background:rgba(37,211,102,.07)}
+.exi input{width:18px;height:18px;accent-color:#25D366}
+.exi img,.exph{width:48px;height:48px;border-radius:10px;object-fit:cover;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:22px}
+.ext{min-width:0}.ext b{display:block;font-size:14px}.ext small{display:block;color:var(--mute);font-size:12px;line-height:1.35}
+.exi em{font-style:normal;font-weight:700;font-size:14px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1001,6 +1011,7 @@ function normalize(p,i){
 const catRes=await fetchCatalog();
 PRODUCTS=(catRes?catRes.productos:fallbackCatalog()).map(normalize);
 byId=Object.fromEntries(PRODUCTS.map(p=>[p.id,p]));
+const EXTRAS=((catRes&&catRes.extras)||[]).filter(e=>e&&e.id&&e.precio>0), exById=Object.fromEntries(EXTRAS.map(e=>[e.id,e]));
 const sizeLabel=p=>{const n=p.sizes.filter(isNum).map(Number);return n.length?(Math.min(...n)===Math.max(...n)?String(n[0]):Math.min(...n)+' – '+Math.max(...n)):p.sizes.slice(0,3).join(', ')};
 
 /* ---------- reseñas: almacenamiento ---------- */
@@ -1175,7 +1186,12 @@ let BAG=store.get(BKEY,[]).filter(i=>byId[i.id]);
 const lineKey=i=>[i.id,i.sizeId||'',i.optId||'',i.vrId||''].join('|');
 function linePrice(i){const p=byId[i.id];if(i.vrId&&p.a){const v=p.a.items.find(z=>z.id===i.vrId);if(v)return v.precio}return p.price}
 function lineLabel(i){const t=[];if(i.sizeName)t.push('Talla '+i.sizeName);if(i.optName)t.push(i.optName);if(i.vrName)t.push(i.vrName);return t.join(' · ')}
-const bagTotal=()=>BAG.reduce((a,i)=>a+linePrice(i)*i.q,0);
+const EXKEY='pu_extras_v1';let EXSEL=(()=>{const o=store.get(EXKEY,{})||{};Object.keys(o).forEach(k=>{if(!exById[k])delete o[k]});return o})();
+const exLines=()=>BAG.length?Object.keys(EXSEL).filter(k=>EXSEL[k]&&exById[k]).map(k=>({ex:exById[k],q:EXSEL[k]})):[];
+const exTotal=()=>exLines().reduce((a,l)=>a+l.ex.precio*l.q,0);
+const bagTotal=()=>BAG.reduce((a,i)=>a+linePrice(i)*i.q,0)+exTotal();
+function extrasHTML(){if(!EXTRAS.length)return '';
+  return `<div class="exw"><div class="exh"><b>Agrega a tu pedido</b><small>Opcional · se suma al total</small></div>${EXTRAS.map(e=>`<label class="exi${EXSEL[e.id]?' on':''}"><input type="checkbox" data-ex="${esc(e.id)}"${EXSEL[e.id]?' checked':''}>${e.img?`<img src="${imgUrl(e.img)}" alt="" loading="lazy">`:`<span class="exph">🎁</span>`}<span class="ext"><b>${esc(e.nombre)}</b>${e.desc?`<small>${esc(e.desc)}</small>`:''}</span><em>+ ${fmt(e.precio)}</em></label>`).join('')}</div>`}
 function saveBag(){store.set(BKEY,BAG);renderBag()}
 function addToBag(p,s,q,fromImg,buyNow){
   const line={id:p.id,q,sizeId:s.size?s.size.id:'',sizeName:s.size?s.size.nombre:'',optId:s.opt?s.opt.id:'',optName:s.opt?s.opt.nombre:'',vrId:s.vr?s.vr.id:'',vrName:s.vr?s.vr.nombre:''};
@@ -1194,7 +1210,8 @@ function renderBag(){const n=BAG.reduce((a,b)=>a+b.q,0);$('#bagN').textContent=n
   if(!BAG.length){dView='bag';L.innerHTML=`<div class="dempty"><img src="${LOGO_K}" alt=""><b style="color:var(--ink);font:800 18px var(--fd)">Tu bolsa está vacía</b><span>Explora la colección y elige tu próximo par.</span><a href="#catalogo" class="btn btn-o" id="dGo">Ver colección</a></div>`;Fo.innerHTML='';$('#dGo').onclick=closeAll;return}
   if(dView==='form')return renderForm(L,Fo);
   L.innerHTML=BAG.map((it,k)=>{const p=byId[it.id];return `<div class="di" style="animation-delay:${k*60}ms"><img src="${p.photos[0]}" alt=""><div><b>${esc(full(p))}</b><small>${esc(p.color)}</small>${lineLabel(it)?`<small>${esc(lineLabel(it))}</small>`:''}<div class="q"><button data-k="${k}" data-d="-1">−</button><span>${it.q}</span><button data-k="${k}" data-d="1">+</button></div></div><div class="r"><b>${fmt(linePrice(it)*it.q)}</b><button class="rm" data-rm="${k}">Quitar</button></div></div>`}).join('');
-  L.insertAdjacentHTML('beforeend',shipHTML());
+  L.insertAdjacentHTML('beforeend',extrasHTML()+shipHTML());
+  $$('[data-ex]',L).forEach(c=>c.onchange=()=>{const id=c.dataset.ex;if(c.checked)EXSEL[id]=1;else delete EXSEL[id];store.set(EXKEY,EXSEL);c.closest('.exi').classList.toggle('on',c.checked);drawFoot()});
   const drawFoot=()=>{Fo.innerHTML=`${totalsHTML()}<button class="btn btn-w" id="dNext">Continuar con mi pedido ${ICON.arrow}</button><small>Pago contraentrega: pagas cuando recibes tu pedido. Te confirmamos disponibilidad y envío por WhatsApp.</small>`;$('#dNext').onclick=()=>{dView='form';renderBag()}};
   drawFoot();bindShip(L,drawFoot);
   $$('[data-d]',L).forEach(b=>b.onclick=()=>{const it=BAG[+b.dataset.k];it.q=Math.max(1,Math.min(9,it.q+ +b.dataset.d));saveBag()});
@@ -1277,7 +1294,7 @@ function renderForm(L,Fo){const c=store.get(CKEY,{});
     <div class="ckl"><label for="ckX">Notas (opcional)</label><textarea id="ckX" maxlength="300" placeholder="Indicaciones de entrega, otra talla de respaldo…"></textarea></div>
     <div class="ckl"><label for="ckV">Código de vendedor (opcional)</label><input id="ckV" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:.08em" value="${esc(VEND_LINK)}" placeholder="Si alguien te atendió, escribe su código"><span class="ckvmsg" id="ckVm"></span></div>
     <input class="hp" id="ckH" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <div class="cksum">${BAG.map(i=>{const p=byId[i.id];return `<div><span>${i.q} × ${esc(full(p))}${lineLabel(i)?' · '+esc(lineLabel(i)):''}</span><b>${fmt(linePrice(i)*i.q)}</b></div>`}).join('')}</div>
+    <div class="cksum">${BAG.map(i=>{const p=byId[i.id];return `<div><span>${i.q} × ${esc(full(p))}${lineLabel(i)?' · '+esc(lineLabel(i)):''}</span><b>${fmt(linePrice(i)*i.q)}</b></div>`}).join('')}${exLines().map(l=>`<div><span>${l.q} × ${esc(l.ex.nombre)}</span><b>${fmt(l.ex.precio*l.q)}</b></div>`).join('')}</div>
     <div class="ckerr" id="ckErr"></div></form>`;
   const drawFoot=()=>{Fo.innerHTML=`${totalsHTML()}<button class="btn btn-w" id="ckGo">Confirmar pedido ${ICON.arrow}</button><button class="btn btn-o" id="ckBack" type="button">← Volver a la bolsa</button>`;
     $('#ckBack').onclick=()=>{dView='bag';renderBag()};$('#ckGo').onclick=submitOrder};
@@ -1299,8 +1316,8 @@ async function submitOrder(){
   const btn=$('#ckGo');btn.disabled=true;btn.style.opacity='.6';btn.firstChild.textContent='Enviando… ';
   const vcod=normV($('#ckV').value);
   const envTxt=`Pago contraentrega | Envío: ${env.etiqueta} ${env.estimado?'aprox. ':''}${fmt(env.costo)}`;
-  const body={seccion:SECCION,cliente:{...cl,notas:(envTxt+(cl.notas?' | '+cl.notas:'')).slice(0,300)},vendedor:vcod,hp:$('#ckH').value,items:BAG.map(i=>({productId:i.id,variacionId:i.vrId||'',variacionColorId:i.sizeId||i.optId||'',cantidad:i.q}))};
-  const snap={cliente:cl,vcod,subtotal:bagTotal(),envio:env,total:bagTotal()+env.costo,items:BAG.map(i=>({q:i.q,name:full(byId[i.id]),label:lineLabel(i),total:linePrice(i)*i.q}))};
+  const body={seccion:SECCION,cliente:{...cl,notas:(envTxt+(cl.notas?' | '+cl.notas:'')).slice(0,300)},vendedor:vcod,hp:$('#ckH').value,items:BAG.map(i=>({productId:i.id,variacionId:i.vrId||'',variacionColorId:i.sizeId||i.optId||'',cantidad:i.q})).concat(exLines().map(l=>({productId:l.ex.id,cantidad:l.q})))};
+  const snap={cliente:cl,vcod,subtotal:bagTotal(),envio:env,total:bagTotal()+env.costo,items:BAG.map(i=>({q:i.q,name:full(byId[i.id]),label:lineLabel(i),total:linePrice(i)*i.q})).concat(exLines().map(l=>({q:l.q,name:l.ex.nombre,label:'',total:l.ex.precio*l.q})))};
   try{
     const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),15000);
     const r=await fetch(`${API}/order`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl.signal});clearTimeout(t);
@@ -1309,7 +1326,7 @@ async function submitOrder(){
       err.innerHTML=esc(j.error||'No pudimos enviar tu pedido.')+` Si prefieres, <a href="${waLink(orderText({...snap,numero:'—'}).replace('Hice el pedido #— en la web','Quiero hacer este pedido'))}" target="_blank" rel="noopener">escríbenos por WhatsApp</a>.`;err.classList.add('on');
       if(r.status===409){/* producto agotado o cambió: refrescar catálogo en segundo plano */ }return}
     store.set(CKEY,{nombre:cl.nombre,tel:cl.tel,ciudad:cl.ciudad,direccion:cl.direccion});VEND_LINK='';try{const u=new URL(location.href);if(u.searchParams.has('v')){u.searchParams.delete('v');history.replaceState(null,'',u.pathname+(u.search||'')+u.hash)}}catch(e){}
-    lastOrder={...snap,numero:j.numero,subtotal:j.total||snap.subtotal,total:(j.total||snap.subtotal)+env.costo,vendedor:j.vendedor||null};BAG=[];store.set(BKEY,BAG);dView='done';renderBag();
+    lastOrder={...snap,numero:j.numero,subtotal:j.total||snap.subtotal,total:(j.total||snap.subtotal)+env.costo,vendedor:j.vendedor||null};BAG=[];store.set(BKEY,BAG);EXSEL={};store.set(EXKEY,EXSEL);dView='done';renderBag();
   }catch(e){
     btn.disabled=false;btn.style.opacity='';btn.firstChild.textContent='Confirmar pedido ';
     err.innerHTML=`No pudimos conectar. Revisa tu internet o <a href="${waLink(orderText({...snap,numero:'—'}).replace('Hice el pedido #— en la web','Quiero hacer este pedido'))}" target="_blank" rel="noopener">escríbenos por WhatsApp</a> y te atendemos igual.`;err.classList.add('on')}}
