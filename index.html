@@ -996,7 +996,7 @@ function normalize(p,i){
   const names=sizeItems.map(z=>z.nombre), nums=names.filter(isNum).map(Number);
   const gender=['Mujer','Hombre','Unisex'].includes(p.genero)?p.genero:nums.length&&nums.length===names.length?(Math.max(...nums)<=39?'Mujer':Math.min(...nums)>=40?'Hombre':'Unisex'):'Unisex';
   return {id:p.id,brand:titleCase(p.marca)||'Korven',name:p.nombre,color:p.color||'',price:p.precio,tag:p.etiqueta||null,desc:p.desc||'',
-    photos:photos.length?photos:[LOGO_K],rank:i,agotado:!!p.agotado,proximo:!(p.precio>0),a:p.a||null,opt,sizeItems,sizes:names,gender};
+    photos:photos.length?photos:[LOGO_K],rank:i,agotado:!!p.agotado,proximo:!(p.precio>0),thumb:p.th?imgUrl(p.th):'',a:p.a||null,opt,sizeItems,sizes:names,gender};
 }
 const catRes=await fetchCatalog();
 PRODUCTS=(catRes?catRes.productos:fallbackCatalog()).map(normalize);
@@ -1056,8 +1056,8 @@ function filtered(){const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLo
 function cardHTML(p,i){const r=ratingOf(p.id);const sz=sizeLabel(p);const tg=p.proximo?'Próximamente':p.agotado?'Agotado':p.tag;
   return `<article class="pc" data-id="${p.id}" style="--d:${(i%4)*70}ms">
     <div class="media" data-cursor="VER">${tg?`<span class="badge ${tg==='Más vendido'||tg==='Nuevo'||tg==='Agotado'?'w':''}">${esc(tg)}</span>`:''}<span class="gtag">${p.gender}</span>
-      <img class="a" src="${p.photos[0]}" alt="${esc(p.brand+' '+p.name+' '+p.color)}" loading="lazy" decoding="async">
-      <img class="b" src="${p.photos[1]||p.photos[0]}" alt="" loading="lazy" decoding="async">
+      <img class="a" src="${p.thumb||p.photos[0]}" alt="${esc(p.brand+' '+p.name+' '+p.color)}" loading="lazy" decoding="async">
+      <img class="b" data-src="${p.photos[1]||p.thumb||p.photos[0]}" alt="" decoding="async">
       <button class="qv" tabindex="-1">Agregar al carrito</button></div>
     <div class="info"><span class="br">${esc(p.brand)}</span><span class="rt">${r?`★ ${r.avg.toFixed(1)} <span style="color:var(--mute)">(${r.n})</span>`:''}</span>
       <h3>${esc(p.name)}</h3><span class="cw">${esc(p.color)}</span>
@@ -1069,7 +1069,7 @@ function renderGrid(animate){const g=$('#grid');const l=filtered();
     $$('.pc',g).forEach(c=>gridIO.observe(c));bindCards();bindCursor(g)};
   if(animate){const old=$$('.pc',g);old.forEach(c=>c.classList.add('out'));setTimeout(()=>{draw();
     const gt=$('#grid').getBoundingClientRect().top;if(gt<0)window.scrollTo({top:scrollY+gt-150,behavior:RM?'auto':'smooth'})},old.length?240:0)}else draw()}
-function bindCards(){$$('.pc').forEach(c=>{const m=$('.media',c);m.onclick=()=>openProduct(c.dataset.id);
+function bindCards(){$$('.pc').forEach(c=>{const m=$('.media',c);m.onclick=()=>openProduct(c.dataset.id);m.addEventListener('pointerenter',()=>{const b=$('.b',c);if(b&&!b.getAttribute('src')&&b.dataset.src)b.src=b.dataset.src},{once:true});
   if(FINE&&!RM){m.onmousemove=e=>{const r=m.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;m.style.transform=`perspective(900px) rotateY(${x*7}deg) rotateX(${-y*7}deg)`};m.onmouseleave=()=>m.style.transform=''}})}
 
 /* ---------- observadores de aparición ---------- */
