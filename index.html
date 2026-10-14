@@ -1106,7 +1106,9 @@ if(LOOK.length>=3)(function(){const tr=$('#track');
 /* ---------- modal de producto ---------- */
 let curP=null,slide=0,qty=1,sel={};
 function sizeGroups(p){
-  const it=p.sizeItems,num=it.filter(z=>isNum(z.nombre)),oth=it.filter(z=>!isNum(z.nombre));
+  const it=p.sizeItems;
+  if(it.some(z=>z.g)){const gs=[];['Mujer','Hombre'].forEach(n=>{const a=it.filter(z=>z.g===n);if(a.length)gs.push([n,a])});const o=it.filter(z=>!z.g);if(o.length)gs.push(['Talla',o]);return gs}
+  const num=it.filter(z=>isNum(z.nombre)),oth=it.filter(z=>!isNum(z.nombre));
   const lo=num.filter(z=>+z.nombre<=39),hi=num.filter(z=>+z.nombre>=40);
   const rng=a=>a.length>1?`${a[0].nombre} – ${a.at(-1).nombre}`:a[0].nombre;
   const g=[];if(lo.length)g.push(['Mujer · '+rng(lo),lo]);if(hi.length)g.push(['Hombre · '+rng(hi),hi]);if(oth.length)g.push([num.length?'Otras':'Talla',oth]);
