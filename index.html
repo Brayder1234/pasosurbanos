@@ -649,6 +649,8 @@ footer{background:var(--bg);padding:clamp(70px,9vw,120px) 0 30px;overflow:hidden
 .exi img,.exph{width:48px;height:48px;border-radius:10px;object-fit:cover;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:22px}
 .ext{min-width:0}.ext b{display:block;font-size:14px}.ext small{display:block;color:var(--mute);font-size:12px;line-height:1.35}
 .exi em{font-style:normal;font-weight:700;font-size:14px;white-space:nowrap}
+
+.ckloc{margin:-4px 0 12px;display:flex;flex-direction:column;gap:6px}.ckloc .btn{width:100%}.ckloc small{color:var(--mute);font-size:12px}
 </style>
 </head>
 <body>
@@ -1274,6 +1276,7 @@ function bindShip(root,onChange){
 
 /* ---------- pedido: datos de envío y envío a la plataforma ---------- */
 const CKEY='pu_cliente_v1', VKEY='pu_vend';
+let LOC=store.get('pu_loc_v1',null);
 // Enlace de un vendedor: <dominio>/?v=CODIGO  → el código queda guardado y se rellena al pedir
 // El código SOLO cuenta si el cliente entró por el enlace del vendedor (?v=CODIGO en esta visita).
 // Si entra de cualquier otra forma (Instagram, Google, escribiendo la dirección…) no hay código: la venta es directa.
@@ -1291,6 +1294,7 @@ function renderForm(L,Fo){const c=store.get(CKEY,{});
     <div class="ckl"><label for="ckT">WhatsApp / teléfono</label><input id="ckT" name="tel" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" value="${esc(c.tel||'')}" placeholder="300 000 0000"></div>
     ${shipHTML()}
     <div class="ckl"><label for="ckD">Dirección de entrega</label><input id="ckD" name="addr" autocomplete="street-address" maxlength="160" value="${esc(c.direccion||'')}" placeholder="Calle, número, barrio"></div>
+    ${SHIP.modo==='baq'||SHIP.modo==='sol'?`<div class="ckloc"><button type="button" id="ckLoc" class="btn btn-o">${LOC?'✓ Ubicación compartida':'📍 Compartir mi ubicación exacta'}</button><small id="ckLocMsg">${LOC?'Gracias: el domiciliario llegará directo a tu puerta.':'Opcional: así el domiciliario te encuentra más rápido.'}</small></div>`:''}
     <div class="ckl"><label for="ckX">Notas (opcional)</label><textarea id="ckX" maxlength="300" placeholder="Indicaciones de entrega, otra talla de respaldo…"></textarea></div>
     <div class="ckl"><label for="ckV">Código de vendedor (opcional)</label><input id="ckV" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:.08em" value="${esc(VEND_LINK)}" placeholder="Si alguien te atendió, escribe su código"><span class="ckvmsg" id="ckVm"></span></div>
     <input class="hp" id="ckH" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -1300,6 +1304,11 @@ function renderForm(L,Fo){const c=store.get(CKEY,{});
     $('#ckBack').onclick=()=>{dView='bag';renderBag()};$('#ckGo').onclick=submitOrder};
   drawFoot();bindShip(L,drawFoot);$('#ckf').onsubmit=e=>{e.preventDefault();submitOrder()};
   $$('.ckf input').forEach(i=>i.oninput=()=>i.parentElement.classList.remove('bad'));
+  const lb=$('#ckLoc');if(lb)lb.onclick=()=>{const m=$('#ckLocMsg');
+    if(!navigator.geolocation){m.textContent='Tu navegador no permite compartir la ubicación.';return}
+    lb.disabled=true;m.textContent='Buscando tu ubicación…';
+    navigator.geolocation.getCurrentPosition(p=>{LOC={lat:p.coords.latitude,lng:p.coords.longitude};store.set('pu_loc_v1',LOC);lb.disabled=false;lb.textContent='✓ Ubicación compartida';m.textContent='Gracias: el domiciliario llegará directo a tu puerta.'},
+      ()=>{lb.disabled=false;m.textContent='No pudimos obtenerla. Escribe bien tu dirección y barrio.'},{enableHighAccuracy:true,timeout:10000,maximumAge:60000})};
   const cv=$('#ckV'),cm=$('#ckVm');let vt=0;
   const chkV=async()=>{const c=normV(cv.value);cm.className='ckvmsg';cm.textContent='';if(c.length<3)return;
     try{const r=await fetch(`${API}/vendedor?codigo=${encodeURIComponent(c)}`);const j=await r.json();if(normV(cv.value)!==c)return;
@@ -1316,7 +1325,7 @@ async function submitOrder(){
   const btn=$('#ckGo');btn.disabled=true;btn.style.opacity='.6';btn.firstChild.textContent='Enviando… ';
   const vcod=normV($('#ckV').value);
   const envTxt=`Pago contraentrega | Envío: ${env.etiqueta} ${env.estimado?'aprox. ':''}${fmt(env.costo)}`;
-  const body={seccion:SECCION,cliente:{...cl,notas:(envTxt+(cl.notas?' | '+cl.notas:'')).slice(0,300)},vendedor:vcod,hp:$('#ckH').value,items:BAG.map(i=>({productId:i.id,variacionId:i.vrId||'',variacionColorId:i.sizeId||i.optId||'',cantidad:i.q})).concat(exLines().map(l=>({productId:l.ex.id,cantidad:l.q})))};
+  const body={seccion:SECCION,cliente:{...cl,notas:(envTxt+(cl.notas?' | '+cl.notas:'')).slice(0,300)},vendedor:vcod,hp:$('#ckH').value,ubicacion:(SHIP.modo==='baq'||SHIP.modo==='sol')&&LOC?LOC:undefined,items:BAG.map(i=>({productId:i.id,variacionId:i.vrId||'',variacionColorId:i.sizeId||i.optId||'',cantidad:i.q})).concat(exLines().map(l=>({productId:l.ex.id,cantidad:l.q})))};
   const snap={cliente:cl,vcod,subtotal:bagTotal(),envio:env,total:bagTotal()+env.costo,items:BAG.map(i=>({q:i.q,name:full(byId[i.id]),label:lineLabel(i),total:linePrice(i)*i.q})).concat(exLines().map(l=>({q:l.q,name:l.ex.nombre,label:'',total:l.ex.precio*l.q})))};
   try{
     const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),15000);
@@ -1326,7 +1335,7 @@ async function submitOrder(){
       err.innerHTML=esc(j.error||'No pudimos enviar tu pedido.')+` Si prefieres, <a href="${waLink(orderText({...snap,numero:'—'}).replace('Hice el pedido #— en la web','Quiero hacer este pedido'))}" target="_blank" rel="noopener">escríbenos por WhatsApp</a>.`;err.classList.add('on');
       if(r.status===409){/* producto agotado o cambió: refrescar catálogo en segundo plano */ }return}
     store.set(CKEY,{nombre:cl.nombre,tel:cl.tel,ciudad:cl.ciudad,direccion:cl.direccion});VEND_LINK='';try{const u=new URL(location.href);if(u.searchParams.has('v')){u.searchParams.delete('v');history.replaceState(null,'',u.pathname+(u.search||'')+u.hash)}}catch(e){}
-    lastOrder={...snap,numero:j.numero,subtotal:j.total||snap.subtotal,total:(j.total||snap.subtotal)+env.costo,vendedor:j.vendedor||null};BAG=[];store.set(BKEY,BAG);EXSEL={};store.set(EXKEY,EXSEL);dView='done';renderBag();
+    lastOrder={...snap,numero:j.numero,subtotal:j.total||snap.subtotal,total:(j.total||snap.subtotal)+env.costo,vendedor:j.vendedor||null};BAG=[];store.set(BKEY,BAG);EXSEL={};store.set(EXKEY,EXSEL);LOC=null;store.set('pu_loc_v1',null);dView='done';renderBag();
   }catch(e){
     btn.disabled=false;btn.style.opacity='';btn.firstChild.textContent='Confirmar pedido ';
     err.innerHTML=`No pudimos conectar. Revisa tu internet o <a href="${waLink(orderText({...snap,numero:'—'}).replace('Hice el pedido #— en la web','Quiero hacer este pedido'))}" target="_blank" rel="noopener">escríbenos por WhatsApp</a> y te atendemos igual.`;err.classList.add('on')}}
