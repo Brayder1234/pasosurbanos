@@ -279,7 +279,7 @@ body.navhide .toolbar{top:0}
 .acc .ab a{text-decoration:underline;text-underline-offset:3px}
 .acc[open] .ab{animation:fu .5s var(--ease) both}
 
-/* ---------- redes / trabaja / pie ---------- */
+/* ---------- redes / pie ---------- */
 .rgrid2{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 @media(max-width:860px){.rgrid2{grid-template-columns:1fr}}
 .rcard{display:flex;align-items:center;gap:16px;padding:18px;border:1px solid var(--line);border-radius:20px;background:var(--bg2);transition:transform .5s var(--ease),border-color .3s}
@@ -292,11 +292,7 @@ body.navhide .toolbar{top:0}
 .rcard small{font:800 10.5px var(--fd);letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
 .rcard b{font:800 18px/1.2 var(--fd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rcard em{font-style:normal;font-size:13px;color:var(--mute)}
-.tcard{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;padding:clamp(24px,4vw,52px);border:1px solid var(--line);border-radius:26px;background:radial-gradient(700px circle at 85% 0%,rgba(255,255,255,.07),transparent 60%),var(--bg2)}
-.tcard h2{font:900 clamp(30px,4.6vw,64px)/.93 var(--fd);letter-spacing:-.035em;text-transform:uppercase;margin:14px 0 14px}
-.tcard p{color:var(--mute);max-width:460px}
-@media(max-width:760px){.tcard .btn{width:100%}}
-footer{padding:clamp(60px,8vw,110px) 0 calc(30px + var(--sb));border-top:1px solid var(--line);margin-top:clamp(60px,8vw,110px)}
+@media(max-width:760px){footer{padding:clamp(60px,8vw,110px) 0 calc(30px + var(--sb));border-top:1px solid var(--line);margin-top:clamp(60px,8vw,110px)}
 .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px}
 @media(max-width:860px){.fgrid{grid-template-columns:1fr 1fr;gap:26px 16px}.fgrid>div:first-child{grid-column:1/-1}}
 .fgrid h5{font:800 11px var(--fd);letter-spacing:.2em;text-transform:uppercase;color:var(--mute);margin-bottom:14px}
@@ -598,7 +594,7 @@ body.hasbar .bagbar{transform:none}
 <nav class="top" id="nav">
   <div class="wrap row">
     <a href="#top" class="brand" aria-label="Korven inicio"><img src="img/logo-korven.png" alt="" width="30" height="30"><span class="w">KORVEN</span></a>
-    <div class="links"><a href="#catalogo">Colección</a><a href="#como">Cómo comprar</a><a href="#tallas">Tallas</a><a href="#faq">Preguntas</a><a href="https://trabaja.korvenoficial.store" target="_blank" rel="noopener">Vende con nosotros</a></div>
+    <div class="links"><a href="#catalogo">Colección</a><a href="#como">Cómo comprar</a><a href="#tallas">Tallas</a><a href="#faq">Preguntas</a></div>
     <div class="nr">
       <button class="ib" id="srchBtn" aria-label="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
       <button class="ib bagb" id="bagBtn" aria-label="Abrir bolsa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="n bagN">0</span></button>
@@ -708,25 +704,12 @@ body.hasbar .bagbar{transform:none}
   </div>
 </section>
 
-<section id="trabaja">
-  <div class="wrap">
-    <a class="tcard rv" href="https://trabaja.korvenoficial.store" target="_blank" rel="noopener">
-      <div>
-        <span class="eyebrow">Vende con nosotros</span>
-        <h2>¿Quieres ganar <span class="o">vendiendo?</span></h2>
-        <p>Tú consigues los clientes, nosotros despachamos. Sin inversión, sin inventario y con tu propio enlace de ventas. <b style="color:var(--ink)">Participa por un premio de $500.000</b> (aplican TyC).</p>
-      </div>
-      <span class="btn btn-w">Quiero vender <svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
-  </div>
-</section>
-
 <footer>
   <div class="wrap">
     <div class="fgrid">
       <div><a href="#top" class="brand" style="margin-bottom:16px"><img src="img/logo-korven.png" alt="" style="height:38px"><span class="w" style="font-size:18px">KORVEN</span></a><p style="max-width:320px;color:var(--mute)">Tenis con pago contraentrega. Despachamos desde Soledad, Atlántico, a toda Colombia.</p></div>
       <div><h5>Tienda</h5><a href="#catalogo">Colección</a><a href="#tallas">Guía de tallas</a><a href="#como">Cómo comprar</a></div>
-      <div><h5>Ayuda</h5><a href="#faq">Preguntas frecuentes</a><a href="#" class="waL" target="_blank" rel="noopener">WhatsApp</a><a href="https://trabaja.korvenoficial.store" target="_blank" rel="noopener">Vende con nosotros</a></div>
+      <div><h5>Ayuda</h5><a href="#faq">Preguntas frecuentes</a><a href="#" class="waL" target="_blank" rel="noopener">WhatsApp</a></div>
       <div><h5>Síguenos</h5><a href="#" class="igL" target="_blank" rel="noopener">Instagram</a><a href="#" class="ttL" target="_blank" rel="noopener">TikTok</a></div>
     </div>
     <div class="fbig">KORVEN</div>
@@ -1137,7 +1120,7 @@ try{const v=new URLSearchParams(location.search).get('v');if(v)VEND_LINK=String(
 try{localStorage.removeItem('pu_vend')}catch(e){}
 const normV=t=>String(t||'').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9]/g,'').slice(0,12);
 const telDigits=t=>{let d=String(t||'').replace(/\D/g,'');if(d.length===12&&d.startsWith('57'))d=d.slice(2);return d};
-function orderText(o){return `Hola Korven \u{1F44B} Hice el pedido #${o.numero} en la web:\n\n`+o.items.map(i=>`• ${i.q} x ${i.name}${i.label?' ('+i.label+')':''} — ${fmt(i.total)}`).join('\n')+(o.envio&&o.envio.ok?`\n\nSubtotal: ${fmt(o.subtotal)}\nEnvío (${o.envio.etiqueta}): ${o.envio.estimado?'aprox. ':''}${fmt(o.envio.costo)}`:'')+`\n\nTotal: ${fmt(o.total)}\nPago: contraentrega\n\nNombre: ${o.cliente.nombre}\nCiudad: ${o.cliente.ciudad}\nDirección: ${o.cliente.direccion}`+(o.vcod?`\nCódigo de vendedor: ${o.vcod}`:'')}
+function orderText(o){return `Hola Korven \u{1F44B} Hice el pedido #${o.numero} en la web:\n\n`+o.items.map(i=>`• ${i.q} x ${i.name}${i.label?' ('+i.label+')':''} — ${fmt(i.total)}`).join('\n')+(o.envio&&o.envio.ok?`\n\nSubtotal: ${fmt(o.subtotal)}\nEnvío (${o.envio.etiqueta}): ${o.envio.estimado?'aprox. ':''}${fmt(o.envio.costo)}`:'')+`\n\nTotal: ${fmt(o.total)}\nPago: contraentrega\n\nNombre: ${o.cliente.nombre}\nCiudad: ${o.cliente.ciudad}\nDirección: ${o.cliente.direccion}`}
 function totalsHTML(){const e=envioCalc(),sub=bagTotal();
   return `<div class="tot sub"><span>Productos</span><b>${fmt(sub)}</b></div><div class="tot sub"><span>Envío${e.estimado?' (aprox.)':''}</span><b>${e.ok?fmt(e.costo):'Elige tu ciudad'}</b></div><div class="tot"><span>Pagas al recibir</span><b>${fmt(sub+(e.ok?e.costo:0))}</b></div>`}
 function renderForm(L,Fo){steps(1);$('#dTitle').textContent='Datos de entrega';const c=store.get(CKEY,{});
@@ -1150,7 +1133,6 @@ function renderForm(L,Fo){steps(1);$('#dTitle').textContent='Datos de entrega';c
     <div class="ckl"><label for="ckD">Dirección de entrega</label><input id="ckD" name="addr" autocomplete="street-address" maxlength="160" value="${esc(c.direccion||'')}" placeholder="Calle, número, barrio y referencia" enterkeyhint="done"><span class="er">Escribe tu dirección con barrio</span></div>
     <div class="ckloc" id="ckLocW" ${loc()?'':'hidden'}><button type="button" id="ckLoc" class="btn btn-o">${LOC?'✓ Ubicación compartida':'📍 Compartir mi ubicación exacta'}</button><small id="ckLocMsg">${LOC?'Gracias: el domiciliario llegará directo a tu puerta.':'Opcional: así el domiciliario te encuentra más rápido.'}</small></div>
     <details><summary>Agregar una nota (opcional)</summary><div><textarea id="ckX" maxlength="300" placeholder="Indicaciones de entrega, horario, otra talla de respaldo…"></textarea></div></details>
-    <details ${VEND_LINK?'open':''}><summary>¿Te atendió un vendedor?</summary><div><input id="ckV" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" style="text-transform:uppercase;letter-spacing:.08em" value="${esc(VEND_LINK)}" placeholder="Código del vendedor"><span class="ckvmsg" id="ckVm"></span></div></details>
     <input class="hp" id="ckH" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="cksum">${BAG.map(i=>{const p=byId[i.id];return `<div><span>${i.q} × ${esc(full(p))}${lineLabel(i)?' · '+esc(lineLabel(i)):''}</span><b>${fmt(linePrice(i)*i.q)}</b></div>`}).join('')}${exLines().map(l=>`<div><span>${l.q} × ${esc(l.ex.nombre)}</span><b>${fmt(l.ex.precio*l.q)}</b></div>`).join('')}<div style="color:var(--mute)"><button type="button" id="ckEdit" style="color:var(--mute);text-decoration:underline;text-underline-offset:3px;font-size:13px">Editar mi bolsa</button></div></div>
     <div class="ckerr" id="ckErr"></div></form>`;
@@ -1164,12 +1146,7 @@ function renderForm(L,Fo){steps(1);$('#dTitle').textContent='Datos de entrega';c
     if(!navigator.geolocation){m.textContent='Tu navegador no permite compartir la ubicación.';return}
     lb.disabled=true;m.textContent='Buscando tu ubicación…';
     navigator.geolocation.getCurrentPosition(p=>{LOC={lat:p.coords.latitude,lng:p.coords.longitude};store.set('pu_loc_v1',LOC);lb.disabled=false;lb.textContent='✓ Ubicación compartida';m.textContent='Gracias: el domiciliario llegará directo a tu puerta.'},
-      ()=>{lb.disabled=false;m.textContent='No pudimos obtenerla. Escribe bien tu dirección y barrio.'},{enableHighAccuracy:true,timeout:10000,maximumAge:60000})};
-  const cv=$('#ckV'),cm=$('#ckVm');let vt=0;
-  const chkV=async()=>{const c=normV(cv.value);cm.className='ckvmsg';cm.textContent='';if(c.length<3)return;
-    try{const r=await fetch(`${API}/vendedor?codigo=${encodeURIComponent(c)}`);const j=await r.json();if(normV(cv.value)!==c)return;
-      if(j.ok){cm.className='ckvmsg okv';cm.textContent=`✓ Te atiende ${j.nombre}`}else{cm.className='ckvmsg nov';cm.textContent='No encontramos ese código. Revísalo o déjalo vacío.'}}catch(e){}};
-  cv.addEventListener('input',()=>{clearTimeout(vt);vt=setTimeout(chkV,350)});if(cv.value)chkV()}
+      ()=>{lb.disabled=false;m.textContent='No pudimos obtenerla. Escribe bien tu dirección y barrio.'},{enableHighAccuracy:true,timeout:10000,maximumAge:60000})};}
 let sending=false;
 async function submitOrder(){if(sending)return;
   const v=id=>($('#'+id)?.value||'').trim();const err=$('#ckErr');err.classList.remove('on');
@@ -1182,7 +1159,7 @@ async function submitOrder(){if(sending)return;
     const first=bad.length?$('#'+bad[0]):$('#dL [data-shipbox]');first.scrollIntoView({block:'center',behavior:RM?'auto':'smooth'});if(bad.length)setTimeout(()=>first.focus({preventScroll:true}),300);else if(SHIP.modo==='otra')$('#dL [data-shipc]').focus();
     toast(!env.ok&&!bad.length?'Elige dónde recibes tu pedido':'Revisa los datos marcados',0,0,1);return}
   sending=true;const btn=$('#ckGo');btn.disabled=true;btn.firstChild.textContent='Enviando tu pedido… ';
-  const vcod=normV(v('ckV'));
+  const vcod=normV(VEND_LINK);
   const envTxt=`Pago contraentrega | Envío: ${env.etiqueta} ${env.estimado?'aprox. ':''}${fmt(env.costo)}`;
   const body={seccion:SECCION,cliente:{...cl,notas:(envTxt+(cl.notas?' | '+cl.notas:'')).slice(0,300)},vendedor:vcod,hp:v('ckH'),ubicacion:(SHIP.modo==='baq'||SHIP.modo==='sol')&&LOC?LOC:undefined,items:BAG.map(i=>({productId:i.id,variacionId:i.vrId||'',variacionColorId:i.sizeId||i.optId||'',cantidad:i.q})).concat(exLines().map(l=>({productId:l.ex.id,cantidad:l.q})))};
   const snap={cliente:cl,vcod,subtotal:bagTotal(),envio:env,total:bagTotal()+env.costo,items:BAG.map(i=>({q:i.q,name:full(byId[i.id]),label:lineLabel(i),total:linePrice(i)*i.q})).concat(exLines().map(l=>({q:l.q,name:l.ex.nombre,label:'',total:l.ex.precio*l.q})))};
@@ -1203,7 +1180,6 @@ function renderDone(L,Fo){const o=lastOrder;if(!o){dView='bag';return renderBag(
     <h4>¡Pedido recibido!</h4><span class="num">PEDIDO #${esc(o.numero)}</span>
     <p>Gracias, ${esc(o.cliente.nombre.split(' ')[0])}. Te escribiremos por WhatsApp al <b>${esc(o.cliente.tel)}</b> para confirmar tu pedido y el envío.</p>
     <div class="pay"><span>No tienes que pagar nada ahora</span><b>Pagas ${fmt(o.total)} al recibir</b><span>${o.envio&&o.envio.tipo==='domicilio'?'Le pagas al domiciliario cuando te entregue.':'Le pagas a la transportadora cuando te entregue.'}${o.envio&&o.envio.estimado?' El envío es aproximado: te confirmamos el valor exacto.':''}</span></div>
-    ${o.vendedor?`<span class="num">TE ATIENDE ${esc(String(o.vendedor).toUpperCase())}</span>`:''}
     <div class="cksum" style="width:100%;text-align:left">${o.items.map(i=>`<div><span>${i.q} × ${esc(i.name)}${i.label?' · '+esc(i.label):''}</span><b>${fmt(i.total)}</b></div>`).join('')}${o.envio&&o.envio.ok?`<div><span>Envío · ${esc(o.envio.etiqueta)}${o.envio.estimado?' (aprox.)':''}</span><b>${fmt(o.envio.costo)}</b></div>`:''}<div><span>Total al recibir</span><b>${fmt(o.total)}</b></div></div></div>`;
   Fo.innerHTML=`<a class="btn btn-g" href="${waLink(orderText(o))}" target="_blank" rel="noopener">${ICON.wa.replace('<svg','<svg style="width:19px;height:19px"')} Enviar mi pedido por WhatsApp</a><button class="btn btn-o" id="dSeguir" type="button">Seguir viendo la colección</button><small>Escribirnos es opcional: adelanta la confirmación, pero tu pedido ya quedó registrado.</small>`;
   $('#dSeguir').onclick=goHome}
@@ -1222,7 +1198,6 @@ function renderFAQ(){const q=[
   ['¿Cuánto cuesta el envío?',`Domicilio en Barranquilla <b>${fmt(ENVIO.domicilio.baq.precio)}</b> y en Soledad <b>${fmt(ENVIO.domicilio.sol.precio)}</b>. A otras ciudades enviamos por transportadora y el valor depende del destino: lo ves en la bolsa antes de confirmar tu pedido.`],
   ['¿Cómo sé que mi pedido quedó registrado?','Al confirmar ves tu número de pedido en pantalla y te escribimos por WhatsApp para confirmar la talla, la dirección y el envío.'],
   ['¿Cómo elijo mi talla?','Mide tu pie de talón a punta y compáralo con nuestra <a href="#tallas">guía de tallas</a>. Si quedas entre dos tallas, elige la mayor. Si tienes dudas, escríbenos por WhatsApp antes de pedir.'],
-  ['Alguien me recomendó la tienda, ¿dónde pongo su código?','Si entraste por el enlace de un vendedor, su código ya queda puesto. Si no, escríbelo en «¿Te atendió un vendedor?» al hacer tu pedido.'],
   ['¿Alguien de Korven me puede pedir un pago por adelantado?','<b>Nunca.</b> Si alguien te pide dinero antes de la entrega a nombre de Korven, no somos nosotros. Escríbenos a nuestro WhatsApp oficial y lo verificamos.']];
   $('#faqL').innerHTML=q.map(([a,b],i)=>`<details class="acc rv" style="--d:${i*50}ms"${i?'':' open'}><summary>${a}<i>${ICON.plus}</i></summary><div class="ab">${b}</div></details>`).join('');
   $$('#faqL .rv').forEach(el=>revIO.observe(el))}
