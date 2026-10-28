@@ -238,6 +238,30 @@ body.navhide .toolbar{top:0}
 .pc .cm{display:inline-flex;align-items:center;gap:5px;margin-top:3px;font:600 11.5px var(--fb);color:var(--ok)}
 .pc .cm svg{width:13px;height:13px}
 .skel .media{animation:none}
+/* ofertas */
+.badge.of{background:#ffd60a;border-color:#ffd60a;color:#111}
+.pc .pr b.hot{color:#fff}
+.pc .pr s,.pz s{color:var(--mute);font-weight:600;text-decoration:line-through;text-decoration-thickness:1.5px}
+.pc .pr .pn{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.pc .pr .pn s{font:600 12.5px var(--fb)}
+.pz .pct{font:800 13px var(--fd);background:#ffd60a;color:#111;border-radius:99px;padding:3px 10px}
+.pz s{font:600 18px var(--fb)}
+.cdl{display:flex;align-items:center;gap:8px;padding:11px 14px;border-radius:14px;background:rgba(255,214,10,.1);border:1px solid rgba(255,214,10,.45);color:#ffe98a;font:700 13px var(--fd)}
+.cdl b{font:900 15px var(--fd);color:#fff;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.cdl svg{width:18px;height:18px;flex:none}
+.ofs{position:relative;overflow:hidden;background:linear-gradient(135deg,#171400,#0a0a0a 55%);border-block:1px solid rgba(255,214,10,.35);padding:clamp(34px,5vw,60px) 0}
+.ofs::before{content:"";position:absolute;width:560px;height:560px;right:-160px;top:-240px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,10,.2),transparent 62%);pointer-events:none}
+.ofs .hd{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:26px;position:relative}
+.ofs h2{font:900 clamp(34px,6vw,70px)/.92 var(--fd);letter-spacing:-.035em;text-transform:uppercase;margin-top:12px}
+.ofs h2 span{color:#ffd60a}
+.ofs .eb{color:#ffe98a}
+.cd{display:flex;gap:8px}
+.cd div{min-width:64px;padding:10px 8px 8px;border-radius:14px;background:#ffd60a;color:#111;text-align:center}
+.cd b{display:block;font:900 30px/1 var(--fd);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.cd small{display:block;font:700 9.5px var(--fd);letter-spacing:.12em;text-transform:uppercase;margin-top:3px}
+.ofg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;position:relative}
+@media(max-width:900px){.ofg{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;margin:0 calc(var(--pad)*-1);padding:0 var(--pad) 6px;scrollbar-width:none}.ofg::-webkit-scrollbar{display:none}.ofg .pc{flex:0 0 62%;scroll-snap-align:start}.cd div{min-width:56px}.cd b{font-size:26px}}
+.ofg .pc{opacity:1;transform:none}
 @keyframes sk{from{background-position:120% 0}to{background-position:-120% 0}}
 .skel .ln{height:12px;border-radius:6px;background:var(--card);margin-top:10px;width:70%}
 .skel .ln.s{width:40%}
@@ -630,6 +654,14 @@ body.hasbar .bagbar{transform:none}
 
 <div class="marq" aria-hidden="true"><div class="tr" id="marq"></div></div>
 
+<section class="ofs" id="ofertas" hidden>
+  <div class="wrap">
+    <div class="hd"><div><span class="eyebrow">Por tiempo limitado</span><h2>Ofertas <span>hasta el <i id="ofD"></i></span></h2></div>
+      <div class="cd" id="cdBig" aria-label="Tiempo restante de la oferta"></div></div>
+    <div class="ofg" id="ofg"></div>
+  </div>
+</section>
+
 <section class="sec how" id="como">
   <div class="wrap">
     <div class="sh">
@@ -786,10 +818,28 @@ const API=CONFIG.api, SECCION=CONFIG.seccion;
 const imgUrl=h=>!h?'':/^(https?:|data:|img\/)/.test(h)?h:`${API}/img/${h}`;
 const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
 
-/* ---------- barra de avisos ---------- */
-(function(){const msgs=[[ICON.cash,'Contraentrega en Barranquilla y Soledad'],[ICON.truck,'Envíos a toda Colombia'],[ICON.chat,'Te confirmamos tu pedido por WhatsApp']];
+/* ---------- ofertas: fechas, barra de avisos y cronómetro ---------- */
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const fechaOf=ms=>{const d=new Date(ms-5*3600e3);return d.getUTCDate()+' de '+MESES[d.getUTCMonth()]};      // hora de Colombia (UTC-5)
+const cdTxt=ms=>{let t=Math.max(0,Math.floor((ms-Date.now())/1000));const d=Math.floor(t/86400);t%=86400;const h=Math.floor(t/3600),m=Math.floor(t%3600/60),sg=t%60,z=n=>String(n).padStart(2,'0');return (d?d+'d ':'')+z(h)+':'+z(m)+':'+z(sg)};
+let annT=null;
+function renderAnn(){const fin=PRODUCTS.filter(p=>p.before).map(p=>p.until).sort()[0];
+  const msgs=[...(fin?[['','🔥 Ofertas hasta el '+fechaOf(fin)]]:[]),[ICON.cash,'Contraentrega en Barranquilla y Soledad'],[ICON.truck,'Envíos a toda Colombia'],[ICON.chat,'Te confirmamos tu pedido por WhatsApp']];
   const a=$('#ann');a.innerHTML=msgs.map(([i,t],k)=>`<div class="it${k?'':' on'}">${i}<span>${t}</span></div>`).join('');
-  const its=$$('.it',a);let k=0;if(!RM)setInterval(()=>{if(document.hidden)return;its[k].classList.remove('on');its[k].classList.add('out');const o=its[k];setTimeout(()=>o.classList.remove('out'),700);k=(k+1)%its.length;its[k].classList.add('on')},3600)})();
+  const its=$$('.it',a);let k=0;clearInterval(annT);if(!RM)annT=setInterval(()=>{if(document.hidden)return;its[k].classList.remove('on');its[k].classList.add('out');const o=its[k];setTimeout(()=>o.classList.remove('out'),700);k=(k+1)%its.length;its[k].classList.add('on')},3600)}
+function renderOfertas(){const l=PRODUCTS.filter(p=>p.before&&!p.agotado).sort((a,b)=>b.price-a.price);const sec=$('#ofertas');
+  if(!l.length){sec.hidden=true;return}
+  const fin=Math.min(...l.map(p=>p.until));sec.hidden=false;$('#ofD').textContent=fechaOf(fin);
+  $('#cdBig').dataset.fin=fin;$('#ofg').innerHTML=l.map((p,i)=>cardHTML(p,i)).join('');$$('#ofg .pc').forEach(c=>c.classList.add('in'));
+  $('#ofg').onclick=cardClick;tick()}
+let expirada=false;
+function tick(){const big=$('#cdBig');
+  if(big&&big.dataset.fin){const t=Math.max(0,Math.floor((+big.dataset.fin-Date.now())/1000));const d=Math.floor(t/86400),h=Math.floor(t%86400/3600),m=Math.floor(t%3600/60),sg=t%60,z=n=>String(n).padStart(2,'0');
+    big.innerHTML=[[d,'días'],[z(h),'horas'],[z(m),'min'],[z(sg),'seg']].map(([v,l])=>`<div><b>${v}</b><small>${l}</small></div>`).join('')}
+  $$('[data-cd]').forEach(e=>e.textContent=cdTxt(+e.dataset.cd));
+  const fin=Math.min(...PRODUCTS.filter(p=>p.before).map(p=>p.until));
+  if(isFinite(fin)&&fin<=Date.now()&&!expirada){expirada=true;fetchCatalog().then(j=>{if(j){applyCatalog(j);refreshAll()}})}}
+setInterval(tick,1000);
 
 /* ---------- catálogo (viene de la plataforma) ---------- */
 let PRODUCTS=[], byId={}, EXTRAS=[], exById={}, CAT_OK=false;
@@ -800,7 +850,7 @@ function normalize(p,i){
   const {opt,s:sizeItems}=sizeItemsOf(p);
   const names=sizeItems.map(z=>z.nombre), nums=names.filter(isNum).map(Number);
   const gender=['Mujer','Hombre','Unisex'].includes(p.genero)?p.genero:nums.length&&nums.length===names.length?(Math.max(...nums)<=39?'Mujer':Math.min(...nums)>=40?'Hombre':'Unisex'):'Unisex';
-  return {id:String(p.id),brand:titleCase(p.marca)||'Korven',name:p.nombre||'',color:p.color||'',price:+p.precio||0,tag:p.etiqueta||'',desc:p.desc||'',
+  return {id:String(p.id),brand:titleCase(p.marca)||'Korven',name:p.nombre||'',color:p.color||'',price:+p.precio||0,before:(+p.antes>+p.precio&&p.hasta&&Date.parse(p.hasta)>Date.now())?+p.antes:0,until:p.hasta?Date.parse(p.hasta):0,tag:p.etiqueta||'',desc:p.desc||'',
     photos:photos.length?photos:[LOGO_K],thumb:p.th?imgUrl(p.th):(photos[0]||LOGO_K),rank:i,agotado:!!p.agotado,proximo:!(p.precio>0),propio:!!p.propio,
     a:p.a||null,opt,sizeItems,sizes:names,nums,gender,shoe:nums.length>0&&nums.every(n=>n>=20&&n<=50)};
 }
@@ -811,6 +861,8 @@ async function fetchCatalog(){const ctl=new AbortController();const t=setTimeout
   catch(e){return null}finally{clearTimeout(t)}}
 const full=p=>{const n=norm(p.name),b=norm(p.brand);return n.startsWith(b)||n.startsWith('air jordan')?p.name:p.brand+' '+p.name};
 const sizeLabel=p=>{const n=p.nums;return n.length?(Math.min(...n)===Math.max(...n)?String(n[0]):Math.min(...n)+'–'+Math.max(...n)):''};
+const pct=p=>p.before?Math.round((1-p.price/p.before)*100):0;
+const priceHTML=p=>p.before?`<span class="pn"><b>${fmt(p.price)}</b><s>${fmt(p.before)}</s></span>`:`<b>${p.proximo?'Muy pronto':fmt(p.price)}</b>`;
 const tagOf=p=>p.proximo?['Próximamente','w']:p.agotado?['Agotado','w']:p.tag==='Más vendido'?['Más vendido','w']:p.tag?[p.tag,'']:null;
 
 /* ---------- guía de tallas ---------- */
@@ -917,21 +969,23 @@ function renderMarquee(){let b=[...new Set(PRODUCTS.filter(p=>p.shoe).map(p=>p.b
 /* ---------- catálogo: filtros ---------- */
 const PRANGES=[['all','Todos los precios',()=>true],['a','Hasta $120.000',n=>n<=120000],['b','$120.000 a $150.000',n=>n>120000&&n<=150000],['c','Más de $150.000',n=>n>150000]];
 const SORTS=[['feat','Destacados'],['asc','Precio: menor a mayor'],['desc','Precio: mayor a menor'],['az','Nombre: A – Z']];
-const F={g:'all',b:'all',pr:'all',s:'feat',q:''};
+const F={g:'all',b:'all',pr:'all',s:'feat',q:'',o:false};
 const brands=()=>{const c={};PRODUCTS.forEach(p=>c[p.brand]=(c[p.brand]||0)+1);return Object.entries(c).sort((a,b)=>b[1]-a[1])};
 function filtered(){const q=norm(F.q).trim(),pr=PRANGES.find(x=>x[0]===F.pr)[2];
-  let l=PRODUCTS.filter(p=>(F.g==='all'||p.gender===F.g||p.gender==='Unisex')&&(F.b==='all'||p.brand===F.b)&&(F.pr==='all'||(!p.proximo&&pr(p.price)))&&(!q||q.split(/\s+/).every(w=>norm(`${p.brand} ${p.name} ${p.color} ${p.tag} ${p.gender}`).includes(w))));
+  let l=PRODUCTS.filter(p=>(!F.o||p.before)&&(F.g==='all'||p.gender===F.g||p.gender==='Unisex')&&(F.b==='all'||p.brand===F.b)&&(F.pr==='all'||(!p.proximo&&pr(p.price)))&&(!q||q.split(/\s+/).every(w=>norm(`${p.brand} ${p.name} ${p.color} ${p.tag} ${p.gender}`).includes(w))));
   if(F.s==='asc')l.sort((a,b)=>(a.proximo-b.proximo)||a.price-b.price||a.rank-b.rank);else if(F.s==='desc')l.sort((a,b)=>(a.proximo-b.proximo)||b.price-a.price||a.rank-b.rank);else if(F.s==='az')l.sort((a,b)=>full(a).localeCompare(full(b)));
-  else l.sort((a,b)=>(a.proximo-b.proximo)||(a.agotado-b.agotado)||(b.propio-a.propio)||a.rank-b.rank);
+  else l.sort((a,b)=>(a.proximo-b.proximo)||(a.agotado-b.agotado)||(!!b.before-!!a.before)||(b.propio-a.propio)||a.rank-b.rank);
   return l}
-function activeCount(){return (F.b!=='all')+(F.pr!=='all')+(F.s!=='feat')+(F.g!=='all')+(F.q?1:0)}
+function activeCount(){return (F.o?1:0)+(F.b!=='all')+(F.pr!=='all')+(F.s!=='feat')+(F.g!=='all')+(F.q?1:0)}
 function renderChips(){const el=$('#chips');
   const g=[['all','Todos'],['Hombre','Hombre'],['Mujer','Mujer']].map(([v,l])=>`<button class="chip${F.g===v?' on':''}" data-k="g" data-v="${v}">${l}</button>`).join('');
   const b=brands().slice(0,12).map(([n,c])=>`<button class="chip${F.b===n?' on':''}" data-k="b" data-v="${esc(n)}">${esc(n)}<sup>${c}</sup></button>`).join('');
-  el.innerHTML=g+'<span class="chip sp">·</span>'+b;
-  el.onclick=e=>{const c=e.target.closest('.chip');if(!c||!c.dataset.k)return;const k=c.dataset.k,v=c.dataset.v;F[k]=(k==='b'&&F.b===v)?'all':v;renderChips();renderGrid(true);
+  const nOf=PRODUCTS.filter(p=>p.before).length;
+  const of=nOf?`<button class="chip of${F.o?' on':''}" data-k="o" data-v="1">🔥 Ofertas<sup>${nOf}</sup></button>`:'';
+  el.innerHTML=of+g+'<span class="chip sp">·</span>'+b;
+  el.onclick=e=>{const c=e.target.closest('.chip');if(!c||!c.dataset.k)return;const k=c.dataset.k,v=c.dataset.v;if(k==='o')F.o=!F.o;else F[k]=(k==='b'&&F.b===v)?'all':v;renderChips();renderGrid(true);
     if(k==='b'&&F.b!=='all')requestAnimationFrame(()=>$(`.chip[data-k="b"].on`,el)?.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'}))};
-  const k=activeCount()-(F.g!=='all')-(F.q?1:0),kk=$('#fK');kk.textContent=k;kk.classList.toggle('on',k>0);
+  const k=activeCount()-(F.g!=='all')-(F.q?1:0)-(F.o?1:0),kk=$('#fK');kk.textContent=k;kk.classList.toggle('on',k>0);
   $('#clr').hidden=!activeCount()}
 function renderFS(){const opt=(k,v,l,n)=>`<button class="chip${F[k]===v?' on':''}" data-k="${k}" data-v="${esc(v)}">${esc(l)}${n!=null?`<sup>${n}</sup>`:''}</button>`;
   $('#fsB').innerHTML=`<div><h6>Ordenar por</h6><div class="wrapc">${SORTS.map(([v,l])=>opt('s',v,l)).join('')}</div></div>
@@ -947,7 +1001,7 @@ $('#fsX').onclick=()=>closeLayer('fs');
 $('#fBtn').onclick=()=>{renderFS();openLayer({fs:true})};
 function showFS(){UI.fs=true;$('#fs').classList.add('on')}
 function hideFS(){UI.fs=false;$('#fs').classList.remove('on');renderChips();renderGrid(false);if(fsScroll){fsScroll=false;setTimeout(scrollToGrid,60)}}
-$('#clr').onclick=()=>{Object.assign(F,{g:'all',b:'all',pr:'all',s:'feat',q:''});$('#qM').value='';$('#qD').value='';renderChips();renderGrid(true)};
+$('#clr').onclick=()=>{Object.assign(F,{g:'all',b:'all',pr:'all',s:'feat',q:'',o:false});$('#qM').value='';$('#qD').value='';renderChips();renderGrid(true)};
 (function(){let t;const on=e=>{clearTimeout(t);const v=e.target.value;t=setTimeout(()=>{F.q=v;$('#qM').value=v;$('#qD').value=v;renderChips();renderGrid(true)},220)};$('#qM').oninput=on;$('#qD').oninput=on;
   const openS=()=>{const s=$('#srchM');s.classList.add('on');setTimeout(()=>$('#qM').focus(),50)};
   $('#tbSearch').onclick=()=>{const s=$('#srchM');if(s.classList.contains('on')&&!$('#qM').value){s.classList.remove('on')}else openS()};
@@ -960,10 +1014,10 @@ const PAGE=24;let LIST=[],SHOWN=0;
 const CM=`<span class="cm">${ICON.cash.replace('stroke-width="1.7"','stroke-width="2"')}Pagas al recibir</span>`;
 function cardHTML(p,i){const t=tagOf(p);const sz=sizeLabel(p);
   return `<article class="pc" data-id="${esc(p.id)}" style="--d:${(i%4)*60}ms"><a href="?p=${encodeURIComponent(p.id)}" aria-label="${esc(full(p))}">
-    <div class="media"><div class="badges">${p.propio&&!p.proximo&&!p.agotado?'<span class="badge ok"><i></i>Entrega inmediata</span>':''}${t?`<span class="badge ${t[1]}">${esc(t[0])}</span>`:''}</div>
+    <div class="media"><div class="badges">${p.before?`<span class="badge of">Oferta −${pct(p)}%</span>`:''}${p.propio&&!p.proximo&&!p.agotado?'<span class="badge ok"><i></i>Entrega inmediata</span>':''}${t?`<span class="badge ${t[1]}">${esc(t[0])}</span>`:''}</div>
       <img src="${esc(p.thumb)}" alt="${esc(full(p)+(p.color?' '+p.color:''))}" loading="lazy" decoding="async"></div>
     <div class="info"><span class="br">${esc(p.brand)}</span><h3>${esc(p.name)}</h3>
-      <div class="pr"><b>${p.proximo?'Muy pronto':fmt(p.price)}</b><span>${sz?'Tallas '+sz:''}</span></div></div></a></article>`}
+      <div class="pr">${priceHTML(p)}<span>${sz?'Tallas '+sz:''}</span></div></div></a></article>`}
 const gridIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');gridIO.unobserve(e.target)}}),{rootMargin:'0px 0px -4% 0px',threshold:.04});
 function skeleton(n){return Array.from({length:n},()=>`<div class="pc in skel"><div class="media"></div><div class="ln s"></div><div class="ln"></div></div>`).join('')}
 function renderGrid(anim){const g=$('#grid');
@@ -1012,7 +1066,8 @@ function productHTML(p){const t=tagOf(p);const groups=p.sizeItems.length?sizeGro
       <div class="pi">
         <div>${(p.propio&&ok)||t?`<div class="bdg" style="margin-bottom:12px">${p.propio&&ok?'<span class="badge ok"><i></i>Entrega inmediata</span>':''}${t?`<span class="badge ${t[1]}">${esc(t[0])}</span>`:''}</div>`:''}
           <span class="br">${esc(p.brand)} · ${esc(p.gender)}</span><h1>${esc(p.name)}</h1>${p.color?`<div class="cw">${esc(p.color)}</div>`:''}</div>
-        <div class="pz"><b id="pPrice">${p.proximo?'Muy pronto':fmt(p.price)}</b>${ok?'<span id="pPay"></span>':''}</div>
+        <div class="pz"><b id="pPrice">${p.proximo?'Muy pronto':fmt(p.price)}</b>${p.before?`<s>${fmt(p.before)}</s><em class="pct" style="font-style:normal">−${pct(p)}%</em>`:''}${ok?'<span id="pPay"></span>':''}</div>
+        ${p.before?`<div class="cdl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>La oferta termina en <b data-cd="${p.until}"></b></div>`:''}
         ${ok?`<div class="codbig" id="pCod"></div>`:''}
         ${opts&&ok?`<div id="pSzW"><div class="lab"><span>Elige ${need}</span>${p.sizeItems.length&&p.shoe?'<button type="button" id="pGuide">Guía de tallas</button>':''}</div><div class="sgrp" id="pSz">${opts}<span class="hint">Selecciona ${need} para continuar</span></div></div>`:''}
         ${ok?`<div class="pacts"><button class="btn btn-o" id="pAdd">${ICON.bagPlus}Agregar a la bolsa</button><button class="btn btn-g shine" id="pBuy">Pedir ahora ${ICON.arrow}</button></div>`
@@ -1027,7 +1082,7 @@ function productHTML(p){const t=tagOf(p);const groups=p.sizeItems.length?sizeGro
       </div>
     </div>
     <section class="rel" id="pRel"></section>
-    ${ok?`<div class="pv-bar"><div class="pp"><b id="pPrice3">${fmt(p.price)}</b><small id="pPay3"></small></div><button class="ib" id="pAdd2" aria-label="Agregar a la bolsa">${ICON.bagPlus}</button><button class="btn btn-g shine" id="pBuy2">Pedir ahora ${ICON.arrow}</button></div>`:''}`}
+    ${ok?`<div class="pv-bar"><div class="pp"><b id="pPrice3">${fmt(p.price)}</b><small id="pPay3">${p.before?"Antes "+fmt(p.before):""}</small></div><button class="ib" id="pAdd2" aria-label="Agregar a la bolsa">${ICON.bagPlus}</button><button class="btn btn-g shine" id="pBuy2">Pedir ahora ${ICON.arrow}</button></div>`:''}`}
 let pendingPV=null;
 function openProduct(id,fromImg){if(!byId[id]){if(!CAT_OK){pendingPV=id;return}return}
   if(fromImg&&document.startViewTransition&&!RM&&!UI.pv){
@@ -1243,16 +1298,16 @@ addEventListener('scroll',()=>requestAnimationFrame(onScroll),{passive:true});
 $('#lb').onclick=()=>$('#lb').classList.remove('on');
 
 /* ---------- arranque ---------- */
-function refreshAll(){renderHero();renderMarquee();renderChips();renderGrid(false);renderBag();
+function refreshAll(){renderAnn();renderOfertas();renderHero();renderMarquee();renderChips();renderGrid(false);renderBag();
   if(pendingPV&&byId[pendingPV]){const id=pendingPV;pendingPV=null;if(UI.pv!==id)openLayer({pv:id})}}
-renderSizes();renderFAQ();renderRedes();
+renderAnn();renderSizes();renderFAQ();renderRedes();
 // enlace directo a un producto (?p=ID): primero el inicio en el historial, así «atrás» vuelve al catálogo
 const P0=new URLSearchParams(location.search).get('p');
 history.replaceState({},'',urlFor({}));
 if(P0)pendingPV=P0;
 const cached=store.get(CAT_KEY,null);
 if(cached&&cached.ok&&Array.isArray(cached.productos)&&cached.productos.length){applyCatalog(cached);refreshAll();setTimeout(countUp,600)}else{renderGrid(false);renderBag()}
-fetchCatalog().then(j=>{if(j){const changed=!cached||j.actualizado!==cached.actualizado||!CAT_OK;applyCatalog(j);if(changed){refreshAll();setTimeout(countUp,300)}}
+fetchCatalog().then(j=>{if(j){const sg=x=>x.productos.map(p=>p.id+':'+p.precio+':'+(p.antes||0)).join();const changed=!cached||j.actualizado!==cached.actualizado||!CAT_OK||sg(j)!==sg(cached);applyCatalog(j);if(changed){refreshAll();setTimeout(countUp,300)}}
   else if(!CAT_OK){CAT_OK=true;PRODUCTS=[];pendingPV=null;renderGrid(false);renderBag()}});
 onScroll();
 </script>

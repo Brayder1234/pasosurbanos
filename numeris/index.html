@@ -60,6 +60,16 @@ header a.all{font-size:13px;font-weight:700;border-bottom:2px solid var(--ink);p
 .cta.g{background:var(--g);color:var(--ink)}
 .cta[disabled]{opacity:.6}
 .hcopy .cta{margin-top:20px;width:min(100%,380px)}
+.ofr{display:inline-flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px;padding:14px 18px;border-radius:20px;background:#fff;border:2px solid var(--ink)}
+.ofr .pr2{display:flex;align-items:baseline;gap:10px}
+.ofr s{font:600 18px var(--fb);color:var(--mute);text-decoration-thickness:2px}
+.ofr b{font:44px/1 var(--fd)}
+.ofr em{font:16px/1 var(--fd);font-style:normal;background:var(--g);border-radius:99px;padding:5px 10px}
+.ofr .cdw{font:700 12.5px var(--fb);display:flex;align-items:center;gap:8px}
+.ofr .cdw b{font:22px/1 var(--fd);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+@media(min-width:900px){.ofr{align-items:flex-start}}
+.card .pr s{font:600 13px var(--fb);color:var(--mute);margin-left:6px;font-weight:600}
+.col small s{display:block;margin:1px 0 0}
 .under{margin-top:12px;font-size:13px;color:var(--mute);display:flex;justify-content:center;gap:6px 14px;flex-wrap:wrap}
 .under span::before{content:"✓ ";color:var(--g2);font-weight:800}
 .mq2{border-block:2px solid var(--ink);overflow:hidden;white-space:nowrap;padding:14px 0}
@@ -191,6 +201,7 @@ footer a{text-decoration:underline;text-underline-offset:3px}
     <div class="hcopy">
       <div class="sw" id="sw"></div>
       <h1>La referencia que nadie más tiene en Barranquilla</h1>
+      <div class="ofr" id="ofr" hidden></div>
       <p>Suela alta dentada, cordones XL y el logo NUMERIS bordado. <b>Pocos pares por talla.</b> En Barranquilla y Soledad <b>pagas cuando te llegan.</b></p>
       <button class="cta" data-open>Lo quiero <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       <div class="under"><span>Contraentrega Barranquilla y Soledad</span><span>Envíos a toda Colombia</span><span>Tallas 40 a 44</span></div>
@@ -262,8 +273,10 @@ footer a{text-decoration:underline;text-underline-offset:3px}
 <script>
 const API='https://velora-tienda.sarmientobrayder10.workers.dev', WA='573052977366', WA_FMT='305 297 7366';
 // Los dos NUMERIS de la plataforma: precio, tallas y agotados se actualizan solos desde el catálogo
-const P={negro:{id:'pmvdh3hauwbce',nombre:'NUMERIS Negro',color:'Negro',precio:190000,img:'',tallas:[]},
-         blue:{id:'pmvdh6m0ubrq5',nombre:'NUMERIS White Blue',color:'White Blue',precio:200000,img:'',tallas:[]}};
+const P={negro:{id:'pmvdh3hauwbce',nombre:'NUMERIS Negro',color:'Negro',precio:150000,antes:200000,img:'',tallas:[]},
+         blue:{id:'pmvdh6m0ubrq5',nombre:'NUMERIS White Blue',color:'White Blue',precio:160000,antes:220000,img:'',tallas:[]}};
+const HASTA=Date.parse('2026-10-30T23:59:59-05:00');   // se actualiza solo con lo que diga la plataforma
+P.negro.hasta=P.blue.hasta=HASTA;
 P.negro.img=document.querySelector('#frame img[data-c="negro"]').src;P.blue.img=document.querySelector('#frame img[data-c="blue"]').src;
 const ENVIO={baq:['Barranquilla',10000],sol:['Soledad',12000]};
 const TR={local:9000,regional:10450,nacional:17830,especial:42150};
@@ -273,6 +286,10 @@ const REG=['baranoa','sabanalarga','santo tomas','palmar de varela','sabanagrand
 const ESP=['san andres','providencia','leticia','mitu','inirida','puerto carreno','san jose del guaviare','nuqui','bahia solano','guapi','tumaco','mocoa','puerto asis','puerto leguizamo'];
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const fmt=n=>'$'+Math.round(n||0).toLocaleString('es-CO');
+const oferta=p=>p.antes>p.precio&&p.hasta>Date.now();
+const pct=p=>Math.round((1-p.precio/p.antes)*100);
+const fechaOf=ms=>{const d=new Date(ms-5*3600e3);return d.getUTCDate()+' de '+['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][d.getUTCMonth()]};
+const cdTxt=ms=>{let t=Math.max(0,Math.floor((ms-Date.now())/1000));const d=Math.floor(t/86400);t%=86400;const z=n=>String(n).padStart(2,'0');return (d?d+'d ':'')+z(Math.floor(t/3600))+':'+z(Math.floor(t%3600/60))+':'+z(t%60)};
 const kfmt=n=>'$'+Math.round(n/1000)+'K';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
@@ -284,12 +301,12 @@ const S={c:'negro',talla:null,modo:'',ciudad:'',paso:1};
 const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 
 /* ---------- cintas ---------- */
-(function(){const a='Exclusivo en Barranquilla <b>✦</b> Contraentrega en Barranquilla y Soledad <b>✦</b> Envíos a toda Colombia <b>✦</b> Pocos pares por talla <b>✦</b> ';$('#tape').innerHTML=`<span>${a}</span><span>${a}</span>`;
+(function(){const a=(oferta(P.negro)?'Oferta hasta el '+fechaOf(P.negro.hasta)+' <b>✦</b> ':'')+'Exclusivo en Barranquilla <b>✦</b> Contraentrega en Barranquilla y Soledad <b>✦</b> Envíos a toda Colombia <b>✦</b> Pocos pares por talla <b>✦</b> ';$('#tape').innerHTML=`<span>${a}</span><span>${a}</span>`;
   const b='<span>Suela dentada</span><i>✦</i><em>Cordones XL</em><i>✦</i><span>Logo bordado</span><i>✦</i><em>Solo en KORVEN</em><i>✦</i>';$('#mq2').innerHTML=b+b+b+b})();
 
 /* ---------- catálogo en vivo ---------- */
 async function cargar(){try{const r=await fetch(API+'/catalog?seccion=calzado');const j=await r.json();
-  for(const k in P){const p=(j.productos||[]).find(x=>x.id===P[k].id);if(!p)continue;P[k].precio=p.precio||P[k].precio;
+  for(const k in P){const p=(j.productos||[]).find(x=>x.id===P[k].id);if(!p)continue;P[k].precio=p.precio||P[k].precio;P[k].antes=+p.antes>0?+p.antes:0;P[k].hasta=p.hasta?Date.parse(p.hasta):0;
     P[k].tallas=((p.b&&p.b.items)||[]).map(z=>({id:z.id,n:z.nombre,ag:!!z.agotado})).sort((a,b)=>a.n-b.n)}}catch(e){}
   pintar()}
 
@@ -297,8 +314,9 @@ async function cargar(){try{const r=await fetch(API+'/catalog?seccion=calzado');
 function setColor(c){if(S.c!==c)S.talla=null;S.c=c;$$('#frame img').forEach(i=>i.classList.toggle('off',i.dataset.c!==c));pintar()}
 function pintar(){const p=P[S.c];
   $('#sw').innerHTML=Object.entries(P).map(([k,x])=>`<button type="button" class="${k===S.c?'on':''}" data-c="${k}"><i style="background-image:url('${x.img}')"></i>${esc(x.color)}</button>`).join('');
-  $('#stkP').textContent=kfmt(p.precio);$('#bP').textContent=`${p.color} · ${fmt(p.precio)}`;
-  $('#duo').innerHTML=Object.entries(P).map(([k,x])=>`<div class="card"><div class="im"><img src="${x.img}" alt="NUMERIS ${esc(x.color)}"></div><div class="in"><h3>${esc(x.color)}</h3><div class="pr"><b>${fmt(x.precio)}</b><small>Tallas 40–44</small></div><button type="button" data-pick="${k}">Lo quiero</button></div></div>`).join('');
+  $('#stkP').textContent=kfmt(p.precio);
+  const of=$('#ofr');if(oferta(p)){of.hidden=false;of.innerHTML=`<div class="pr2"><s>${fmt(p.antes)}</s><b>${fmt(p.precio)}</b><em>−${pct(p)}%</em></div><div class="cdw">Termina en <b data-cd="${p.hasta}"></b></div>`;$$('[data-cd]').forEach(e=>e.textContent=cdTxt(+e.dataset.cd))}else of.hidden=true;$('#bP').textContent=`${p.color} · ${fmt(p.precio)}`;$('#bS').textContent=oferta(p)?'Oferta hasta el '+fechaOf(p.hasta):'Contraentrega en Barranquilla y Soledad';
+  $('#duo').innerHTML=Object.entries(P).map(([k,x])=>`<div class="card"><div class="im"><img src="${x.img}" alt="NUMERIS ${esc(x.color)}"></div><div class="in"><h3>${esc(x.color)}</h3><div class="pr"><span><b>${fmt(x.precio)}</b>${oferta(x)?`<s>${fmt(x.antes)}</s>`:''}</span><small>Tallas 40–44</small></div><button type="button" data-pick="${k}">Lo quiero</button></div></div>`).join('');
   if($('#sheet').classList.contains('on')&&S.paso===1)render()}
 let auto=RM?null:setInterval(()=>{if(document.hidden||$('#sheet').classList.contains('on'))return;setColor(S.c==='negro'?'blue':'negro')},4500);
 const pararAuto=()=>{clearInterval(auto);auto=null};
@@ -322,7 +340,7 @@ function calc(){const p=P[S.c];if(ENVIO[S.modo])return{ok:1,costo:ENVIO[S.modo][
 function render(){const p=P[S.c],B=$('#shB'),F=$('#shF');$$('.prog i').forEach((x,i)=>x.classList.toggle('on',i<S.paso));
   if(S.paso===1){$('#shT').textContent='Elige tu par';
     const tallas=p.tallas.length?p.tallas:['40','41','42','43','44'].map(n=>({id:'',n,ag:false}));
-    B.innerHTML=`<div><div class="lab"><span>Color</span></div><div class="cols">${Object.entries(P).map(([k,x])=>`<button type="button" class="col${k===S.c?' on':''}" data-c="${k}"><img src="${x.img}" alt=""><span><b>${esc(x.color)}</b><small>${fmt(x.precio)}</small></span></button>`).join('')}</div></div>
+    B.innerHTML=`<div><div class="lab"><span>Color</span></div><div class="cols">${Object.entries(P).map(([k,x])=>`<button type="button" class="col${k===S.c?' on':''}" data-c="${k}"><img src="${x.img}" alt=""><span><b>${esc(x.color)}</b><small>${fmt(x.precio)}${oferta(x)?`<s>${fmt(x.antes)}</s>`:''}</small></span></button>`).join('')}</div></div>
       <div><div class="lab"><span>Talla</span><button type="button" id="gB">Guía de tallas</button></div><div class="sizes" id="szs">${tallas.map(z=>`<button type="button" class="sz${S.talla&&S.talla.n===z.n?' on':''}" data-n="${esc(z.n)}" ${z.ag?'disabled':''}>${esc(z.n)}</button>`).join('')}</div>
       <p class="note" id="szN">${S.talla?'Talla '+esc(S.talla.n)+' · '+esc(p.color):'Pocos pares por talla. Si quedas entre dos tallas, elige la mayor.'}</p>
       <div class="guide" id="gd"><p><b>40</b><span>25.5 – 26.0 cm</span></p><p><b>41</b><span>26.0 – 26.5 cm</span></p><p><b>42</b><span>27.0 – 27.5 cm</span></p><p><b>43</b><span>27.5 – 28.0 cm</span></p><p><b>44</b><span>28.5 – 29.0 cm</span></p></div></div>`;
@@ -346,7 +364,7 @@ function render(){const p=P[S.c],B=$('#shB'),F=$('#shF');$$('.prog i').forEach((
       $('#res').innerHTML=pre?(e.ok?`Coordinadora · <b>${e.aprox?'aprox. ':''}${fmt(e.costo)}</b>`:'Escribe tu ciudad para calcular el envío.'):'';
       const pay=$('#pay');pay.classList.toggle('pre',pre);pay.innerHTML=pre?`<b>Pago anticipado.</b> Fuera de Barranquilla y Soledad pagas por transferencia antes del despacho. Te escribimos solo desde <b>${WA_FMT}</b>.`:dom?'<b>No pagas nada ahora.</b> Le pagas al domiciliario cuando te entregue.':'<b>Contraentrega en Barranquilla y Soledad.</b> Para otras ciudades el pago es anticipado.';
       $('#sum').innerHTML=`<div><span>${esc(p.nombre)} · Talla ${esc(S.talla.n)}</span><span>${fmt(p.precio)}</span></div><div><span>Envío</span><span>${e.ok?fmt(e.costo):'—'}</span></div><div class="t"><span>${dom?'Pagas al recibir':pre?'Total a transferir':'Total'}</span><b>${fmt(p.precio+(e.ok?e.costo:0))}</b></div>`;
-      $('#bS').textContent=dom?'Pagas al recibir':pre?'Pago anticipado':'Contraentrega en Barranquilla y Soledad'};
+      $('#bS').textContent=dom?'Pagas al recibir':pre?'Pago anticipado':oferta(p)?'Oferta hasta el '+fechaOf(p.hasta):'Contraentrega en Barranquilla y Soledad'};
     $('#ship').onclick=e=>{const b=e.target.closest('.op');if(!b)return;S.modo=b.dataset.m;$('#ship').classList.remove('bad');if(S.modo==='otra')setTimeout(()=>$('#fC').focus(),60);upd()};
     $('#fC').oninput=e=>{S.ciudad=e.target.value;upd()};
     B.querySelectorAll('.fl input').forEach(i=>i.oninput=()=>i.parentElement.classList.remove('bad'));
@@ -385,6 +403,7 @@ function confeti(){if(RM)return;const c=document.createElement('div');c.classNam
 const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});$$('.rv').forEach(x=>io.observe(x));
 addEventListener('scroll',()=>$('#bar').classList.toggle('on',scrollY>innerHeight*.55),{passive:true});
 $$('.waN').forEach(x=>x.textContent=WA_FMT);$('#waF').href=waLink('Hola KORVEN \u{1F44B} Quiero información de los NUMERIS.');$('#yr').textContent=new Date().getFullYear();
+setInterval(()=>{$$('[data-cd]').forEach(e=>e.textContent=cdTxt(+e.dataset.cd));if(P.negro.hasta&&P.negro.hasta<=Date.now()&&!window.__exp){window.__exp=1;cargar()}},1000);
 pintar();cargar();
 </script>
 </body>
