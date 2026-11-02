@@ -241,10 +241,11 @@ body.navhide .toolbar{top:0}
 /* ofertas */
 .badge.of{background:#f5f5f3;border-color:#f5f5f3;color:#111}
 .pc .pr b.hot{color:#fff}
-.pc .pr s,.pz s{color:var(--mute);font-weight:600;text-decoration:line-through;text-decoration-thickness:1.5px}
+.pc .pr s,.pz s{color:#e8e8e4;font-weight:700;text-decoration:line-through;text-decoration-color:#ff3b30;text-decoration-thickness:2px}
+.rib{position:absolute;z-index:3;top:20px;left:-40px;width:150px;padding:5px 0;transform:rotate(-45deg);background:#e5141f;color:#fff;font:900 13px var(--fd);letter-spacing:.04em;text-align:center;box-shadow:0 4px 14px rgba(229,20,31,.45);pointer-events:none}
 .pc .pr .pn{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
-.pc .pr .pn s{font:600 12.5px var(--fb)}
-.pz .pct{font:800 13px var(--fd);background:#f5f5f3;color:#111;border-radius:99px;padding:3px 10px}
+.pc .pr .pn s{font:700 13px var(--fb)}
+.pz .pct{font:800 13px var(--fd);background:#e5141f;color:#fff;border-radius:99px;padding:3px 10px}
 .pz s{font:600 18px var(--fb)}
 .cdl{display:flex;align-items:center;gap:8px;padding:11px 14px;border-radius:14px;background:rgba(245,245,243,.1);border:1px solid rgba(245,245,243,.45);color:#d6d6d1;font:700 13px var(--fd)}
 .cdl b{font:900 15px var(--fd);color:#fff;letter-spacing:.02em;font-variant-numeric:tabular-nums}
@@ -1014,7 +1015,7 @@ const PAGE=24;let LIST=[],SHOWN=0;
 const CM=`<span class="cm">${ICON.cash.replace('stroke-width="1.7"','stroke-width="2"')}Pagas al recibir</span>`;
 function cardHTML(p,i){const t=tagOf(p);const sz=sizeLabel(p);
   return `<article class="pc" data-id="${esc(p.id)}" style="--d:${(i%4)*60}ms"><a href="?p=${encodeURIComponent(p.id)}" aria-label="${esc(full(p))}">
-    <div class="media"><div class="badges">${p.before?`<span class="badge of">Oferta −${pct(p)}%</span>`:''}${t?`<span class="badge ${t[1]}">${esc(t[0])}</span>`:''}</div>
+    <div class="media"><div class="badges">${p.before?`<span class="rib">−${pct(p)}%</span>`:''}${t?`<span class="badge ${t[1]}">${esc(t[0])}</span>`:''}</div>
       <img src="${esc(p.thumb)}" alt="${esc(full(p)+(p.color?' '+p.color:''))}" loading="lazy" decoding="async"></div>
     <div class="info"><span class="br">${esc(p.brand)}</span><h3>${esc(p.name)}</h3>
       <div class="pr">${priceHTML(p)}<span>${sz?'Tallas '+sz:''}</span></div></div></a></article>`}
