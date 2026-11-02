@@ -863,7 +863,7 @@ const full=p=>{const n=norm(p.name),b=norm(p.brand);return n.startsWith(b)||n.st
 const sizeLabel=p=>{const n=p.nums;return n.length?(Math.min(...n)===Math.max(...n)?String(n[0]):Math.min(...n)+'–'+Math.max(...n)):''};
 const pct=p=>p.before?Math.round((1-p.price/p.before)*100):0;
 const priceHTML=p=>p.before?`<span class="pn"><b>${fmt(p.price)}</b><s>${fmt(p.before)}</s></span>`:`<b>${p.proximo?'Muy pronto':fmt(p.price)}</b>`;
-const tagOf=p=>p.proximo?['Próximamente','w']:p.agotado?['Agotado','w']:p.tag==='Más vendido'?['Más vendido','w']:p.tag?[p.tag,'']:null;
+const tagOf=p=>p.proximo?['Próximamente','w']:p.agotado?['Agotado','w']:null;   // sin etiquetas de marketing (Nuevo, Más vendido…): el usuario las quitó el 1-nov
 
 /* ---------- guía de tallas ---------- */
 const TALLAS={m:[[36,'22.5 – 23.0'],[37,'23.0 – 23.5'],[38,'24.0 – 24.5'],[39,'24.5 – 25.0']],h:[[40,'25.5 – 26.0'],[41,'26.0 – 26.5'],[42,'27.0 – 27.5'],[43,'27.5 – 28.0'],[44,'28.5 – 29.0']]};
@@ -1014,7 +1014,7 @@ const PAGE=24;let LIST=[],SHOWN=0;
 const CM=`<span class="cm">${ICON.cash.replace('stroke-width="1.7"','stroke-width="2"')}Pagas al recibir</span>`;
 function cardHTML(p,i){const t=tagOf(p);const sz=sizeLabel(p);
   return `<article class="pc" data-id="${esc(p.id)}" style="--d:${(i%4)*60}ms"><a href="?p=${encodeURIComponent(p.id)}" aria-label="${esc(full(p))}">
-    <div class="media"><div class="badges">${p.before?`<span class="badge of">Oferta −${pct(p)}%</span>`:''}${p.propio&&!p.proximo&&!p.agotado?'<span class="badge ok"><i></i>Entrega inmediata</span>':''}${t?`<span class="badge ${t[1]}">${esc(t[0])}</span>`:''}</div>
+    <div class="media"><div class="badges">${p.before?`<span class="badge of">Oferta −${pct(p)}%</span>`:''}${t?`<span class="badge ${t[1]}">${esc(t[0])}</span>`:''}</div>
       <img src="${esc(p.thumb)}" alt="${esc(full(p)+(p.color?' '+p.color:''))}" loading="lazy" decoding="async"></div>
     <div class="info"><span class="br">${esc(p.brand)}</span><h3>${esc(p.name)}</h3>
       <div class="pr">${priceHTML(p)}<span>${sz?'Tallas '+sz:''}</span></div></div></a></article>`}
@@ -1064,7 +1064,7 @@ function productHTML(p){const t=tagOf(p);const groups=p.sizeItems.length?sizeGro
         ${n>1?`<span class="pg-ct" id="pgCt">1 / ${n}</span><button class="pg-nav p" aria-label="Foto anterior">${ICON.l}</button><button class="pg-nav n" aria-label="Foto siguiente">${ICON.r}</button><div class="pg-dots">${p.photos.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}</div>
         ${n>1?`<div class="pg-th">${p.photos.map((s,i)=>`<button data-i="${i}" class="${i?'':'on'}" aria-label="Foto ${i+1}"><img src="${esc(s)}" alt="" loading="lazy"></button>`).join('')}</div>`:''}</div>
       <div class="pi">
-        <div>${(p.propio&&ok)||t?`<div class="bdg" style="margin-bottom:12px">${p.propio&&ok?'<span class="badge ok"><i></i>Entrega inmediata</span>':''}${t?`<span class="badge ${t[1]}">${esc(t[0])}</span>`:''}</div>`:''}
+        <div>${t?`<div class="bdg" style="margin-bottom:12px">${t?`<span class="badge ${t[1]}">${esc(t[0])}</span>`:''}</div>`:''}
           <span class="br">${esc(p.brand)} · ${esc(p.gender)}</span><h1>${esc(p.name)}</h1>${p.color?`<div class="cw">${esc(p.color)}</div>`:''}</div>
         <div class="pz"><b id="pPrice">${p.proximo?'Muy pronto':fmt(p.price)}</b>${p.before?`<s>${fmt(p.before)}</s><em class="pct" style="font-style:normal">−${pct(p)}%</em>`:''}${ok?'<span id="pPay"></span>':''}</div>
         ${p.before?`<div class="cdl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>La oferta termina en <b data-cd="${p.until}"></b></div>`:''}
