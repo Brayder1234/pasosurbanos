@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <style>
-:root{--paper:#ece9e2;--paper2:#e2ded5;--ink:#0b0b0b;--ink2:#2b2b29;--mute:#6f6d66;--line:#cfcbc1;--g:#2fd27a;--g2:#1fb565;--bad:#d93025;
+:root{--paper:#ece9e2;--paper2:#e2ded5;--ink:#0b0b0b;--ink2:#2b2b29;--mute:#6f6d66;--line:#cfcbc1;--g:#ece9e2;--g2:#0b0b0b;--bad:#d93025;
   --fd:'Anton',Impact,'Arial Narrow Bold',sans-serif;--fb:'Inter',system-ui,-apple-system,sans-serif;--e:cubic-bezier(.22,1,.36,1);--sp:cubic-bezier(.3,1.4,.5,1);--sb:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -38,12 +38,12 @@ header a.all{font-size:13px;font-weight:700;border-bottom:2px solid var(--ink);p
 @keyframes inn{to{opacity:1;transform:rotate(-2deg)}}
 .frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s var(--e),transform 1.2s var(--e)}
 .frame img.off{opacity:0;transform:scale(1.06)}
-.sticker{position:absolute;z-index:3;right:12px;top:14px;width:104px;height:104px;border-radius:50%;background:var(--g);color:var(--ink);display:grid;place-items:center;text-align:center;transform:rotate(12deg);font:22px/1 var(--fd);box-shadow:0 10px 24px rgba(0,0,0,.25);animation:wob 3.5s ease-in-out infinite}
+.sticker{position:absolute;z-index:3;right:12px;top:14px;width:104px;height:104px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;text-align:center;transform:rotate(12deg);font:22px/1 var(--fd);box-shadow:0 10px 24px rgba(0,0,0,.25);animation:wob 3.5s ease-in-out infinite}
 .sticker small{display:block;font:800 9px var(--fb);letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
 @keyframes wob{50%{transform:rotate(4deg) scale(1.04)}}
 .chip-st{position:absolute;z-index:3;left:12px;bottom:12px;background:rgba(11,11,11,.82);color:#fff;border-radius:99px;padding:8px 13px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.chip-st i{width:8px;height:8px;border-radius:50%;background:var(--g);animation:pu 1.8s infinite}
-@keyframes pu{0%{box-shadow:0 0 0 0 rgba(47,210,122,.7)}70%{box-shadow:0 0 0 9px rgba(47,210,122,0)}100%{box-shadow:0 0 0 0 rgba(47,210,122,0)}}
+.chip-st i{width:8px;height:8px;border-radius:50%;background:var(--ink);animation:pu 1.8s infinite}
+@keyframes pu{0%{box-shadow:0 0 0 0 rgba(11,11,11,.7)}70%{box-shadow:0 0 0 9px rgba(11,11,11,0)}100%{box-shadow:0 0 0 0 rgba(11,11,11,0)}}
 .hcopy{position:relative;z-index:2;text-align:center;margin-top:22px}
 .sw{display:inline-flex;gap:6px;padding:5px;border-radius:99px;background:var(--paper2)}
 .sw button{display:flex;align-items:center;gap:8px;height:42px;padding:0 16px 0 6px;border-radius:99px;font-weight:700;font-size:14px;transition:background .3s,color .3s}
@@ -57,14 +57,14 @@ header a.all{font-size:13px;font-weight:700;border-bottom:2px solid var(--ink);p
 .cta::after{content:"";position:absolute;top:0;bottom:0;left:-50%;width:35%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-18deg);animation:shine 3.6s ease-in-out 1.5s infinite}
 @keyframes shine{0%{left:-50%}30%,100%{left:130%}}
 .cta svg{width:20px;height:20px}
-.cta.g{background:var(--g);color:var(--ink)}
+.cta.g{background:var(--ink);color:var(--paper)}
 .cta[disabled]{opacity:.6}
 .hcopy .cta{margin-top:20px;width:min(100%,380px)}
 .ofr{display:inline-flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px;padding:14px 18px;border-radius:20px;background:#fff;border:2px solid var(--ink)}
 .ofr .pr2{display:flex;align-items:baseline;gap:10px}
 .ofr s{font:600 18px var(--fb);color:var(--mute);text-decoration-thickness:2px}
 .ofr b{font:44px/1 var(--fd)}
-.ofr em{font:16px/1 var(--fd);font-style:normal;background:var(--g);border-radius:99px;padding:5px 10px}
+.ofr em{font:16px/1 var(--fd);font-style:normal;background:var(--ink);color:var(--paper);border-radius:99px;padding:5px 10px}
 .ofr .cdw{font:700 12.5px var(--fb);display:flex;align-items:center;gap:8px}
 .ofr .cdw b{font:22px/1 var(--fd);letter-spacing:.04em;font-variant-numeric:tabular-nums}
 @media(min-width:900px){.ofr{align-items:flex-start}}
@@ -104,7 +104,8 @@ h2 em{font-style:normal;-webkit-text-stroke:2px var(--ink);color:transparent}
 .steps b{display:block;font:22px/1.05 var(--fd);text-transform:uppercase;margin:12px 0 6px}
 .steps span{color:var(--ink2);font-size:14.5px}
 .steps i{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--ink);color:#fff;font:20px/1 var(--fd);font-style:normal}
-.steps div:last-child{background:var(--g);border-color:var(--g)}
+.steps div:last-child{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.steps div:last-child i{background:var(--paper);color:var(--ink)}.steps div:last-child span{color:#d6d6d1}
 @media(max-width:760px){.steps{grid-template-columns:1fr}}
 .safe{margin-top:14px;border-radius:22px;background:var(--ink);color:#e9e6df;padding:20px 22px;font-size:14.5px}
 .safe b{color:#fff}
@@ -164,7 +165,7 @@ footer a{text-decoration:underline;text-underline-offset:3px}
 .op span{flex:1}.op b{display:block;font-weight:800;font-size:15px}.op small{color:var(--mute);font-size:12.5px}.op em{font-style:normal;font-weight:800}
 .city{display:none;margin-top:4px}.ship.otra .city{display:block}.ship.bad .op{border-color:var(--bad)}
 .res{font-size:12.5px;color:var(--ink2);margin-top:6px}
-.pay{border-radius:18px;padding:14px 16px;font-size:13.5px;background:#fff;border:2px solid var(--g)}
+.pay{border-radius:18px;padding:14px 16px;font-size:13.5px;background:#fff;border:2px solid var(--ink)}
 .pay b{font-weight:800}.pay.pre{border-color:var(--ink)}
 .sum{border-radius:18px;background:#fff;padding:12px 16px;font-size:14px}
 .sum div{display:flex;justify-content:space-between;gap:10px;padding:4px 0}.sum .t{border-top:1px solid var(--paper2);margin-top:4px;padding-top:8px;font-weight:800;align-items:baseline}
@@ -173,7 +174,7 @@ footer a{text-decoration:underline;text-underline-offset:3px}
 .hp{position:absolute;left:-9999px;opacity:0}
 .back{font-weight:700;font-size:13px;color:var(--mute);padding:6px}
 .done{text-align:center;display:grid;gap:12px;justify-items:center;padding:12px 0}
-.done .ok{width:88px;height:88px;border-radius:50%;background:var(--g);display:grid;place-items:center;animation:pop .7s var(--sp)}
+.done .ok{width:88px;height:88px;border-radius:50%;background:var(--ink);display:grid;place-items:center;animation:pop .7s var(--sp)}
 .done .ok svg{width:42px;height:42px}
 .done h4{font:34px/1 var(--fd);text-transform:uppercase}.done .n{font-weight:800;letter-spacing:.18em;font-size:12px;color:var(--mute)}
 .done p{color:var(--ink2);max-width:340px}
@@ -390,13 +391,13 @@ async function enviar(){if(enviando)return;const p=P[S.c],e=calc(),v=id=>$('#'+i
     if(!r.ok||!j.ok)throw new Error(j.error||'No pudimos enviar tu pedido.');
     store.set('pu_cliente_v1',{nombre,tel,ciudad:e.ciudad,direccion:dir});
     const tot=(j.total||p.precio)+e.costo;S.paso=3;$$('.prog i').forEach(x=>x.classList.add('on'));$('#shT').textContent='¡Listo!';
-    $('#shB').innerHTML=`<div class="done"><div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="#0b0b0b" stroke-width="3" stroke-linecap="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><h4>¡Son tuyos!</h4><span class="n">PEDIDO #${esc(j.numero)}</span>
+    $('#shB').innerHTML=`<div class="done"><div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="#ece9e2" stroke-width="3" stroke-linecap="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><h4>¡Son tuyos!</h4><span class="n">PEDIDO #${esc(j.numero)}</span>
       <p>Gracias, ${esc(nombre.split(' ')[0])}. Te escribimos por WhatsApp al <b>${esc(tel)}</b> para confirmar.</p>
       <div class="pay${e.dom?'':' pre'}" style="text-align:left;width:100%">${e.dom?`<b>No pagas nada ahora.</b> Le pagas ${fmt(tot)} al domiciliario cuando te entregue.`:`<b>Siguiente paso: transferencia de ${fmt(tot)}.</b> Te enviamos los datos desde ${WA_FMT} y despachamos apenas lo confirmemos.`}</div></div>`;
     $('#shF').innerHTML=`<a class="cta g" target="_blank" rel="noopener" href="${waLink(msg(j.numero))}">${e.dom?'Enviar mi pedido por WhatsApp':'Pedir los datos de pago'}</a>`;
     confeti();$('#bar').style.display='none';
   }catch(x){enviando=false;b.disabled=false;b.innerHTML='Confirmar pedido '+ARROW;err.innerHTML=`${esc(x.name==='AbortError'?'No pudimos conectar.':x.message)} Si prefieres, <a target="_blank" rel="noopener" href="${waLink(msg(''))}">pídelo por WhatsApp</a>.`;err.classList.add('on')}}
-function confeti(){if(RM)return;const c=document.createElement('div');c.className='cf';const k=['#2fd27a','#0b0b0b','#ece9e2','#1fb565'];
+function confeti(){if(RM)return;const c=document.createElement('div');c.className='cf';const k=['#0b0b0b','#6f6d66','#ece9e2','#2b2b29'];
   c.innerHTML=Array.from({length:44},(_,i)=>`<i style="left:${Math.random()*100}%;background:${k[i%4]};--x:${(Math.random()-.5)*160}px;--r:${Math.random()*720-360}deg;animation-delay:${Math.random()*.3}s"></i>`).join('');document.body.append(c);setTimeout(()=>c.remove(),3500)}
 
 /* ---------- varios ---------- */
